@@ -12,7 +12,7 @@ java -jar ../closure-compiler-read-only/build/compiler.jar  --js=src/pdqmus.js -
 cp src/*worker*.js src/*.css dist/.
 
 #package quickstart
-mkdir quickstart
-cp hello_solar_system.html dist/*js quickstart/.
-zip quickstart.zip quickstart/*
-tar -cvzf quickstart.tar.gz  quickstart/*
+mkdir pdqmus_quickstart
+cp -R hello_solar_system.html dist pdqmus_quickstart/.
+zip -r pdqmus_quickstart.zip pdqmus_quickstart
+tar -cvzf pdqmus_quickstart.tar.gz  pdqmus_quickstart
