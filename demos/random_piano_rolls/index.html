@@ -1,0 +1,181 @@
+<!--
+TODO:
+double tap for audio
+single tap for midi
+-->
+<html>
+<head>
+<title>Rolls without lifting a finger</title>
+<style type="text/css">
+body
+{
+    margin: 0;
+    padding: 0;
+    font-family:Helvetica, Verdana, Arial, sans-serif;
+}
+
+.pianoRoll
+{
+    border: 1px dotted #666;
+    position: absolute;        
+}    
+
+#controls
+{
+    border: 3px solid #352;
+    font-size: 20px; 
+    color: black;   
+    -moz-border-radius: 5px;
+    border-radius: 5px;        
+    background-color: #fff;  
+    float:bottom;
+    margin-top: 20px;
+    width: 300px;
+}
+
+</style>
+<!-- pdqmus -->    
+<script type="text/javascript" src="../../pdqmus.js"></script>
+<script type="text/javascript" src="../../Notation.js"></script>
+<script type="text/javascript" src="../../Note.js"></script>
+<script type="text/javascript" src="../../Util.js"></script>
+<script type="text/javascript" src="../../Midi.js"></script>
+<script type="text/javascript" src="../../Sound.js"></script>
+<script type="text/javascript" src="../../MidiSound.js"></script>
+<script type="text/javascript" src="../../PianoRoll.js"></script>
+<script type="text/javascript" src="../../Sample.js"></script>
+<script type="text/javascript" src="../../Wave.js"></script>
+<script type="text/javascript" src="../../AudioSequence.js"></script>
+
+<script type="text/javascript">
+<!--
+
+const SOUND_TYPE_AUDIO = "audio";
+const SOUND_TYPE_MIDI = "midi";
+
+var soundType = SOUND_TYPE_MIDI;
+var clickedControls = false;
+function handleOnLoad()
+{
+    document.addEventListener("mousedown", handleFingerDown, false);
+    document.addEventListener("mousemove", handleFingerMove, false);
+    document.addEventListener("mouseup", handleFingerUp, false);
+    var controls = document.getElementById("controls");
+    controls.addEventListener("mousedown", handleControlDown, false);
+    controls.addEventListener("mouseup", handleControlUp, false);
+}  
+
+function handleControlDown(event)
+{
+    clickedControls = true;
+}
+
+function handleControlUp(event)
+{
+    clickedControls = false;
+}
+
+function randomAudioSequence()
+{    
+    // 1 track at 120 BPM
+    var notes = pdqmus.Note.randomNotes(20, true);
+    var randOscillator = pdqmus.Wave.PITCHED_OSCILLATORS[Math.floor(Math.random() * pdqmus.Wave.PITCHED_OSCILLATORS.length)];
+    var as = new pdqmus.AudioSequence(notes, randOscillator);
+    
+    var pr = renderPianoRoll(notes);
+    //TODO: fix up synch 
+    //as.setStartCallback();
+    as.play(true);
+    pr.play();
+}
+
+function randomMidi(cursorPoint)
+{    
+    // 1 track at 120 BPM
+    var midi = new pdqmus.Midi(1, 120);
+    var notes = pdqmus.Note.randomNotes(20);            
+    //put notes on midi track with a random channel and random MIDI patch
+    var randPatch = Math.floor(Math.random() * 127);
+    var randChannel = Math.floor(Math.random() * 16);
+    midi.addTrack(notes, randChannel, randPatch);
+
+    var pr = renderPianoRoll(notes);
+    var ms = pdqmus.MidiSound.createFromUrl(midi.getDataUrl(), document.getElementById("embeds"));
+    //TODO: synch properly
+    ms.play();
+    pr.play();    
+}
+
+function renderPianoRoll(notes)
+{
+    var pr = new pdqmus.PianoRoll(notes, 20, 2, null, null, true);
+    //assign the roll a color based on first note's pitch/velocity/duration values
+    var color = "rgba(" + notes[0] * 2 + "," + notes[0].velocity + "," + Math.round(notes[0].duration * 255) + ", 1.0)";
+    var prCanvas = pr.render(color);
+    prCanvas.className = "pianoRoll"; 
+    prCanvas.style.left = cursorPoint.x; 
+    prCanvas.style.top = cursorPoint.y; 
+    document.getElementsByTagName("body")[0].appendChild(prCanvas);    
+    return pr;   
+}
+
+function handleFingerDown(event)
+{
+    //if controls clicked, do nothing
+    if (clickedControls)
+    {
+        return false;
+    }
+    fingerIsDown = true;
+    cursorPoint = pdqmus.Util.getPosition(event);
+    if (soundType == SOUND_TYPE_MIDI) {
+        randomMidi(cursorPoint);
+    }
+    else 
+    {
+        randomAudioSequence(cursorPoint);
+    }
+}
+
+function handleFingerMove(event)
+{
+    
+}
+
+function handleFingerUp(event)
+{
+    fingerIsDown = false;
+    //TODO:
+    //clear/stop?
+    //remove a single roll
+    //replay   
+}
+
+function clearCanvas()
+{
+    var canvasView = document.getElementById("canvasView");
+    var context = canvasView.getContext('2d')
+    context.clearRect (0, 0,  canvasView.width, canvasView.height);
+}
+
+function changeSoundType(element)
+{
+    soundType = element.value;   
+}
+-->
+</script>
+
+</head>
+<body onload="handleOnLoad();">
+<h1>Rolls without lifting a finger</h1>
+<h2><tt>IRCAM regrets to inform you&hellip; Mr. Cage is dead&hellip; killed at the hands of Mr. Machover. FULL STOP.</tt></h2>
+<h3>The perfect tool for kids having fun or academic composers with deadlines (and those goddamned kids they have to teach).</h3>
+<div id ="embeds" style="visibility: hidden; display: compact;"></div>
+<fieldset id="controls">
+MIDI<input type="radio" name="playbackType" value="midi" checked onclick="changeSoundType(this);"/>
+Audio<input type="radio" name="playbackType" value="audio" onclick="changeSoundType(this);"/>
+</fieldset>
+
+</body>
+
+</html>

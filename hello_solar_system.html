@@ -1,0 +1,69 @@
+<html>
+<head>
+<title>hello world</title>
+<style type="text/css">
+body
+{
+    font-family: Helvetica, sans-serif;
+}
+
+</style>
+<!-- default style for sequencer -->
+<link rel="stylesheet" type="text/css" media="screen" href="sequencer.css">
+
+<!-- pdqmus -->    
+<script type="text/javascript" src="pdqmus.js"></script>
+<script type="text/javascript" src="Notation.js"></script>
+<script type="text/javascript" src="Note.js"></script>
+<script type="text/javascript" src="Util.js"></script>
+<script type="text/javascript" src="Midi.js"></script>
+<script type="text/javascript" src="Sound.js"></script>
+<script type="text/javascript" src="MidiSound.js"></script>
+<script type="text/javascript" src="PianoRoll.js"></script>
+<script type="text/javascript" src="Sample.js"></script>
+<script type="text/javascript" src="Wave.js"></script>
+<script type="text/javascript" src="AudioSequence.js"></script>
+<script type="text/javascript" src="Sequencer.js"></script>
+
+<script type="text/javascript">
+<!--
+function helloSolarSystem()
+{
+    //middle c, d, e with a duration of a 1/4 second, varying velocities
+    var notes = [new pdqmus.Note(0.00, 0.25, 60, 20),
+                 new pdqmus.Note(0.25, 0.25, 62, 50),
+                 new pdqmus.Note(0.50, 0.50, 64, 102)];
+    
+    //create and play MIDI  
+    var midi = new pdqmus.Midi();
+    midi.addTrack(notes);
+    midi.play();
+    
+    //create and play audio using a sawtooth wave and envelope shaping
+    var audioSequence = new pdqmus.AudioSequence(notes, pdqmus.Wave.OSC_SAWTOOTH, 
+                                          pdqmus.Envelope.DEFAULT_ENVELOPE);
+    audioSequence.play();
+    
+    //draw and playback a piano roll, at a larger x scale
+    var pianoRoll = new pdqmus.PianoRoll(notes, 50);
+    pianoRoll.draw();
+    pianoRoll.play();
+    
+    //draw wave form
+    audioSequence.drawWaveform();
+    
+    //create a 60 BPM looping sequencer containing the MIDI and audio
+    var sounds = [pdqmus.MidiSound.createFromUrl(midi.getDataUrl()),
+                  pdqmus.Sample.createFromUrl(audioSequence.getDataUrl())];
+    sequencer = new pdqmus.Sequencer(sounds, 60);
+    sequencer.draw();
+    sequencer.play();    
+}
+-->
+</script>
+
+</head>
+<body onload="helloSolarSystem();">
+</body>
+
+</html>

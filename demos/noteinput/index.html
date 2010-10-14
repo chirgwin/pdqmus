@@ -1,0 +1,1722 @@
+<html>
+<head>
+<script type="text/javascript" src="../../pdqmus.js"></script>
+<script type="text/javascript" src="../../Sound.js"></script>
+<script type="text/javascript" src="../../Sample.js"></script>
+<script type="text/javascript" src="../../Util.js"></script>
+<script type="text/javascript" src="../../Wave.js"></script>
+<script type="text/javascript" src="../../Notation.js"></script>
+<script type="text/javascript" src="../../Note.js"></script>
+<script type="text/javascript" src="../../AudioSequence.js"></script>
+
+<meta name="viewport" content="width=device-width">
+<style type="text/css">
+/*
+usage notes
+------------
+* left mouse down in staff to add note (inserts between notes work, too, and staff will auto-extend)
+* drag up/down to change pitch (upwards gets sharps, downwards gets flats)
+* right mouse down in staff to add rest
+* mouse down (without drag) on note/rest to remove
+* drag left/right on any note/rest to change duration (only 16ths through whole notes)
+* right button drag left/right on any note/rest to add/remove duration dot
+* drag clef up/down to change (only treble or bass)
+* 'export notelist' button spits out notelist
+
+*current limitations: 
+no: chords (single line only), tuplets, ties, positioning, dynamics, markings, instrument names, tempo, grace notes, etc.
+
+TODO
+------------
+multiple duration dots
+octave alteration??
+beams?
+ties???
+tuplets???
+
+
+TODO:
+    time signature
+    barlines
+    beaming
+    chords
+    tuplets
+
+*/
+
+/*iPhone */ 
+* {
+    -webkit-user-select: none;
+}
+* {
+    -webkit-touch-callout: none;
+}
+* {
+   -webkit-tap-highlight-color: rgba(0,0,0,0);
+}        
+
+body 
+{ 
+    background: white;
+    font-family: geneva, verdana, helvetica, arial, sans-serif;
+}
+
+a:link 
+{ 
+    color: #c60;
+    text-decoration: none;
+    font-size: 12px;
+    padding: 0px;
+}
+
+a:visited, a:active 
+{ 
+    color: #669;
+    text-decoration: none;
+    font-size: 12px;
+    padding: 0px;
+}
+
+a:link img, a:visited img
+{ 
+    border-style: none 
+}
+
+a img 
+{ 
+    color: white 
+}
+#staff
+{
+    margin: 20px;
+    width: 100px;
+    height: 49px;
+    background-image: url(staff_bg.gif);
+    background-position: top left;
+    background-repeat: repeat-x;
+    background-color: white;
+    cursor: crosshair;
+}
+#staff_resize
+{
+    float: right;
+    height: 49px;
+    width: 12px;
+}
+#clef
+{
+    margin-top: -10px;
+    background-repeat: no-repeat;
+    float: left;
+    margin-left: 5px;
+    width: 34px;
+    height: 75px;
+}
+
+#notelist
+{
+    width:600px;
+    height:400px;
+}
+
+#preload
+{
+    position: absolute;
+    display: none;
+    height: 0;
+    width: 0;
+}
+
+
+input
+{
+   background-color:#ffffff;
+   border-style:solid;
+   border-color:#000000;
+}
+
+.note_whole_stem_up
+{
+    position: absolute;
+    background-image: url(note_whole.gif);
+    width: 15px;
+    height: 10px;
+}
+.note_whole_stem_down
+{
+    position: absolute;
+    background-image: url(note_whole.gif);
+    width: 15px;
+    height: 10px;
+}
+
+.note_half_stem_up
+{
+    margin-top: -26px;
+    position: absolute;
+    background-image: url(note_half_stem_up.gif);
+    width: 11px;
+    height: 37px;
+}
+
+.note_half_stem_down
+{
+    position: absolute;
+    background-image: url(note_half_stem_down.gif);
+    width: 11px;
+    height: 37px;
+}
+
+.note_quarter_stem_up
+{
+    margin-top: -26px;
+    position: absolute;
+    background-image: url(note_quarter_stem_up.gif);
+    width: 11px;
+    height: 37px;
+}
+
+.note_quarter_stem_down
+{
+    position: absolute;
+    background-image: url(note_quarter_stem_down.gif);
+    width: 11px;
+    height: 37px;
+}
+
+.note_eighth_stem_up
+{
+    margin-top: -26px;
+    position: absolute;
+    background-image: url(note_eighth_stem_up.gif);
+    width: 20px;
+    height: 37px;
+}
+
+.note_eighth_stem_down
+{
+    position: absolute;
+    background-image: url(note_eighth_stem_down.gif);
+    width: 11px;
+    height: 37px;
+}
+
+.note_16th_stem_up
+{
+    margin-top: -26px;
+    position: absolute;
+    background-image: url(note_16th_stem_up.gif);
+    width: 20px;
+    height: 37px;
+}
+
+.note_16th_stem_down
+{
+    position: absolute;
+    background-image: url(note_16th_stem_down.gif);
+    width: 11px;
+    height: 37px;
+}
+
+.note_32nd_stem_up
+{
+    margin-top: -26px;
+    position: absolute;
+    background-image: url(note_32nd_stem_up.gif);
+    width: 20px;
+    height: 43px;
+}
+
+.note_32nd_stem_down
+{
+    position: absolute;
+    background-image: url(note_32nd_stem_down.gif);
+    width: 11px;
+    height: 43px;
+}
+
+
+.rest_whole
+{
+    margin-top: 3px;
+    position: absolute;
+    background-image: url(rest_whole.gif);
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 8px;
+}
+
+.rest_half
+{
+    margin-top: 10px;
+    position: absolute;
+    background-image: url(rest_half.gif);
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 8px;
+}
+
+.rest_quarter
+{
+    position: absolute;
+    background-image: url(rest_quarter.gif);
+    background-repeat: no-repeat;
+    width: 11px;
+    height: 29px;
+}
+
+.rest_eighth
+{
+    margin-top: 5px;
+    position: absolute;
+    background-image: url(rest_eighth.gif);
+    background-repeat: no-repeat;
+    width: 11px;
+    height: 21px;
+}
+
+.rest_16th
+{
+    margin-top: 5px;
+    position: absolute;
+    background-image: url(rest_16th.gif);
+    background-repeat: no-repeat;
+    width: 13px;
+    height: 27px;
+}
+
+
+.clef_treble
+{
+    position: absolute;
+    background-image: url(clef_treble.gif);
+    width: 27px;
+    height: 75px;
+}
+
+.clef_bass
+{
+    position: absolute;
+    background-position: 0px 11px;
+    background-image: url(clef_bass.gif);
+    width: 34px;
+    height: 39px;
+}
+
+.sharp
+{
+    margin-left: -12px;
+    margin-top: -8px;
+    position: absolute;
+    background-image: url(sharp.gif);
+    width: 8px;
+    height: 28px;
+}
+
+.flat
+{
+    margin-top: -12px;
+    margin-left: -12px;
+    position: absolute;
+    background-image: url(flat.gif);
+    width: 8px;
+    height: 25px;
+}
+
+.ledger_line_top
+{
+    margin-top: -1px;
+    margin-left: -4px;
+    position: absolute;
+    background-image: url(ledger_line.gif);
+    width: 18px;
+    height: 1px;
+}
+
+.ledger_line_bottom
+{
+    margin-top: 12px;
+    margin-left: -4px;
+    position: absolute;
+    background-image: url(ledger_line.gif);
+    width: 18px;
+    height: 1px;
+}
+
+.dot_line_quarter
+{
+    margin-left: 14px;
+    margin-top: -2px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+.dot_space_quarter
+{
+    margin-left: 14px;
+    margin-top: 3px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+.dot_line_eighth
+{
+    margin-left: 14px;
+    margin-top: -2px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+.dot_space_eighth
+{
+    margin-left: 14px;
+    margin-top: 3px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+.dot_line_eighth_stem_up
+{
+    margin-left: 21px;
+    margin-top: -2px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+.dot_space_eighth_stem_up
+{
+    margin-left: 21px;
+    margin-top: 3px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+.dot_line_16th
+{
+    margin-left: 14px;
+    margin-top: -2px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+.dot_space_16th
+{
+    margin-left: 14px;
+    margin-top: 3px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+.dot_line_16th_stem_up
+{
+    margin-left: 23px;
+    margin-top: -2px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+.dot_space_16th_stem_up
+{
+    margin-left: 23px;
+    margin-top: 3px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+.dot_line_whole
+{
+    margin-left: 18px;
+    margin-top: -2px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+.dot_space_whole
+{
+    margin-left: 18px;
+    margin-top: 3px;
+    position: absolute;
+    background-image: url(duration_dot.gif);
+    width: 4px;
+    height: 4px;
+}
+
+</style>
+
+<script type="text/javascript">
+var isIphone = navigator.userAgent.indexOf('iPhone') >= 0;  
+
+/* 
+staff positions, in pixels:
+lines: 0 12 24 36 48
+spaces: 6  18 30 42
+*/
+
+
+defaultStaffWidth = 100;
+staffMarginY = 20;
+
+staffPaddingX = 50;
+noteId = 0;
+noteHeight = 10;
+noteWidth = 10;
+noteSpacingX = 24;
+noteSpacingY = 6;
+lineHeight = 12;
+//no support for 32nds for now, "32nd"
+noteTypes = new Array ("whole", "half", "quarter", "eighth", "16th");
+dragTolerance = 3;
+noteNamesSharp =            new    Array('C','C','D','D','E','F','F','G','G','A','A','B');
+noteNamesFlat =                new Array('C','D','D','E','E','F','G','G','A','A','B','B');
+notePitchAlterations =        new Array( 0,  1,  0,  1,  0,  0,  1,  0,  1,  0,  1, 0);
+noteNameLinePosChange =        new Array( 0, 0, 0.5, 0.5, 1, 1.5, 1.5, 2, 2, 2.5, 2.5, 3);
+noteNameLinePosChangeFlat = new Array( 0, 0.5, 0.5, 1, 1, 1.5, 2, 2, 2.5, 2.5, 3, 3);
+
+/* would be same 
+noteNameSharps =    new Array( 0,  1,  0,  1,  0,  0,  1,  0,  1,  0,  1, 0);
+noteNameFlat =        new Array( 0,  1,  0,  1,  0,  0,  1,  0,  1,  0,  1, 0);
+*/
+
+midiNoteInvStaffPos = new Array();
+midiNoteInvStaffPos["treble"] = new Array(77,76,74,72,71,69,67,65,64);
+midiNoteInvStaffPos["bass"] = new Array(57,55,53,52,50,48,47,45,43);
+
+octaveHeight = 42;
+var centerOctave = new Array();
+centerOctave["treble"] = 5;
+centerOctave["bass"] = 3;
+
+var centerOctavePos = new Array();
+centerOctavePos["treble"] = 33;
+centerOctavePos["bass"] = 45;
+
+clefActive = "treble";
+
+ledgerLinePosMax = 75;
+ledgerLinePosMin = 3;
+function snapToGrid(y)
+{
+    //height, including line and all space to next line
+    var ySnapped = y;
+
+    //get nearest line    
+    var nearest = (y - staffMarginY) / lineHeight;
+    var nearestLine = Math.round(nearest) * lineHeight;
+    var isNearestSpace = (nearest < 0.25) ? false : (y - staffMarginY) % lineHeight < (lineHeight / 2);
+    ySnapped = isNearestSpace ? nearestLine + (lineHeight / 2) :  nearestLine;
+    ySnapped = ySnapped + staffMarginY - (noteHeight / 2);
+    return ySnapped;
+}
+
+function getMidiNote(y)
+{
+    //height, including line and all space to next line
+    var ySnapped = y;
+    
+    //get nearest line
+    var nearest = (y - staffMarginY) / lineHeight;
+    var isNearestSpace = (nearest < 0.25) ? false : (y - staffMarginY) % lineHeight < (lineHeight / 2);
+    
+    var nearestLine = Math.round(nearest);
+    inversePosIdx = isNearestSpace? ((nearestLine * lineHeight + lineHeight / 2)/lineHeight) * 2:
+                    nearestLine * 2;
+    return midiNoteInvStaffPos[clefActive][inversePosIdx];
+}
+
+function isStemUp(y)
+{
+    var nearest = (y - staffMarginY) / lineHeight;
+    if (nearest >= 2)
+    {
+        return true;
+    }
+    
+    return false;
+}
+
+function isPosOnLine(y)
+{
+    var nearest = (y - staffMarginY) / lineHeight;
+    return (Math.floor(nearest) != Math.round(nearest));
+    
+}
+
+function addStaffEvents(element)
+{
+    var drag = { on: false, x: 0, y: 0};
+    function doMouseDown(event)
+    {        
+        if (isIphone)
+        {
+            document.body.addEventListener("touchmove", function(e) {
+                                           e.preventDefault();
+                                           });
+            event.preventDefault();
+            var clientX = event.targetTouches[0].pageX;
+            var clientY = event.targetTouches[0].pageY;
+        }
+        else
+        {
+            var clientX = event.clientX;
+            var clientY = event.clientY;
+        }
+
+        // if right click or two fingers on iPhone, add a rest        
+        if (event.button == 2 || ("targetTouches" in event && event.targetTouches.length == 2)
+            || ("ctrlKey" in event && event.ctrlKey == true))
+        {
+            //add note
+            note = new InputNote(clientX, clientY, true);
+            addRestEvents(note.domRef);    
+                
+            var staff = document.getElementById("staff");
+            staff.appendChild(note.domRef);
+            respaceNotes();
+        } else 
+        {
+            //add note
+            note = new InputNote(clientX, clientY, false);
+                
+            addNoteEvents(note.domRef);        
+            var staff = document.getElementById("staff");
+            staff.appendChild(note.domRef);
+            respaceNotes();
+            playNote(note);
+        }
+    }
+
+    function doMouseUp(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+        }
+
+    }
+    
+    if ("addEventListener" in element) 
+    {
+        if (isIphone)
+        {
+            element.addEventListener("touchstart", doMouseDown, false);
+            element.addEventListener("touchend",   doMouseUp, false);        
+        }
+        else
+        {
+            element.addEventListener("mousedown", doMouseDown, false);
+            element.addEventListener("mouseup", doMouseUp, false);
+        }
+    }
+    else if ("attachEvent" in element) 
+    {
+        element.attachEvent("onmousedown", doMouseDown);
+        element.attachEvent("onmouseup", doMouseUp);
+    }
+
+}
+
+function addNoteEvents(element)
+{
+    var drag = { on: false, x: 0, y: 0, prevX: 0, prevY: 0, moved: false, button: 0};
+
+    function startDrag(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+            var clientX = event.targetTouches[0].pageX;
+            var clientY = event.targetTouches[0].pageY;
+        }
+        else
+        {
+            var clientX = event.clientX;
+            var clientY = event.clientY;
+        }
+
+        //ensure events don't bubble up to staff
+        //event.cancelBubble=true;    
+        event.stopPropagation();
+        drag.on = true;
+        drag.x  = clientX;
+        drag.y  = clientY;
+        drag.prevX  = clientX;
+        drag.prevY  = clientY;
+        drag.moved = false;
+        drag.button = event.button;
+        document.getElementById("staff").style.cursor = "move";
+    }
+
+    function stopDrag(event)
+    {
+        var clientX = 0;
+        var clientY = 0;
+        if (isIphone)
+        {
+            event.preventDefault();
+            //TODO: get note deletes working on iPhone
+            //alert(event.targetTouches.length + " " + event.targetTouches[0]);
+            
+            if (event.targetTouches &&  event.targetTouches.length > 0)
+            {
+                var clientX = event.targetTouches[0].pageX;
+                var clientY = event.targetTouches[0].pageY;
+            }
+        }
+        else
+        {
+            var clientX = event.clientX;
+            var clientY = event.clientY;
+        }
+        //if no position change, and a right click, delete note
+        //alert (drag.x + "=?"+ clientX + " " + drag.y + "=?"+ clientY + !drag.moved);
+
+        if (drag.x  == clientX && drag.y  == clientY && !drag.moved)
+        {
+            element.note.remove();
+        }
+        if (drag.on)
+        {
+            drag.on = false;
+            document.getElementById("staff").style.cursor = "crosshair";
+        }
+    }
+
+    function doDrag(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+            var clientX = event.targetTouches[0].pageX;
+            var clientY = event.targetTouches[0].pageY;
+        }
+        else
+        {
+            var clientX = event.clientX;
+            var clientY = event.clientY;
+        }
+        if (drag.on)
+        {
+
+            // if right click
+            if (drag.button == 2)
+            {
+                //add/remove dot(s) (only 1 for now)
+                if (clientX < (drag.x - dragTolerance) || clientX > (drag.x + dragTolerance))
+                {
+                    if (clientX > drag.prevX)
+                    {
+                        element.note.changeDots(1);                
+                    } else {
+                        element.note.removeDots();
+                    }                
+                    drag.moved = true;
+                }                
+                //if x position has change, change duration
+                //drag left/right
+                //change duration
+            } else {
+                if (clientX < (drag.x - dragTolerance) || clientX > (drag.x + dragTolerance))
+                {
+                    if (clientX < drag.prevX)
+                    {
+                        element.note.changeDuration(1);                
+                    } else {
+                        element.note.changeDuration(-1);
+                    }                
+                    drag.moved = true;
+                    drag.prevX = clientX;
+                }
+                //if y position has changed, change pitch
+                //drag up/down
+                //snap to line/space
+                if (clientY < (drag.y - dragTolerance) || clientY > (drag.y + dragTolerance))
+                {
+                    if (clientY < drag.prevY)
+                    {
+                        element.note.changePitch(-1);
+                    } else {
+                        element.note.changePitch(1);                
+                    }
+                    drag.moved = true;
+                    drag.prevY = clientY;
+                }                
+            }
+        }
+    }
+    
+    if ("addEventListener" in element) 
+    {
+        if (isIphone)
+        {
+            element.addEventListener("touchstart", startDrag, false);
+            element.addEventListener("touchend",   stopDrag,  false);
+            element.addEventListener("touchmove", doDrag,    false);
+            element.addEventListener("touchcancel", stopDrag,    false);        
+        }
+        else
+        {
+            element.addEventListener("mousedown", startDrag, false);
+            element.addEventListener("mouseup",   stopDrag,  false);
+            element.addEventListener("mousemove", doDrag,    false);
+            element.addEventListener("mouseout", stopDrag,    false);        
+        }
+    }
+    else if ("attachEvent" in element) 
+    {
+        element.attachEvent("onmousedown", startDrag);
+        element.attachEvent("onmouseup",   stopDrag);
+        element.attachEvent("onmousemove", doDrag);
+        element.attachEvent("onmouseout", stopDrag);
+
+    }
+
+}
+
+function addRestEvents(element)
+{
+    var drag = { on: false, x: 0, y: 0, prevX: 0, prevY: 0, moved: false, button: 0};
+
+    function startDrag(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+            var clientX = event.targetTouches[1].pageX;
+            var clientY = event.targetTouches[1].pageY;
+        }
+        else
+        {
+            var clientX = event.clientX;
+            var clientY = event.clientY;
+        }
+
+        //ensure events don't bubble up to staff
+        //event.cancelBubble=true;    
+        event.stopPropagation();
+        drag.on = true;
+        drag.x  = clientX;
+        drag.y  = clientY;
+        drag.prevX  = clientX;
+        drag.prevY  = clientY;
+        drag.moved = false;
+        drag.button = event.button;
+    }
+
+    function stopDrag(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+            var clientX = event.targetTouches[0].pageX;
+            var clientY = event.targetTouches[0].pageY;
+        }
+        else
+        {
+            var clientX = event.clientX;
+            var clientY = event.clientY;
+        }
+
+        //if no position change, delete rest
+        if (drag.x  == clientX && drag.y  == clientY && !drag.moved)
+        {
+            element.note.remove();
+        }
+        if (drag.on)
+        {
+            drag.on = false;
+        }
+    }
+
+    function doDrag(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+            var clientX = event.targetTouches[0].pageX;
+            var clientY = event.targetTouches[0].pageY;
+        }
+        else
+        {
+            var clientX = event.clientX;
+            var clientY = event.clientY;
+        }
+
+        if (drag.on)
+        {
+            // if right click
+            if (drag.button == 2)
+            {
+                //add/remove dot(s) (only 1 for now)
+                if (clientX < (drag.x - dragTolerance) || clientX > (drag.x + dragTolerance))
+                {
+                    if (clientX > drag.prevX)
+                    {
+                        element.note.changeDots(1);                
+                    } else {
+                        element.note.removeDots();
+                    }                
+                    drag.moved = true;
+                }                
+                //if x position has change, change duration
+                //drag left/right
+                //change duration
+            } else {
+                if (clientX < (drag.x - dragTolerance) || clientX > (drag.x + dragTolerance))
+                {
+                    if (clientX < drag.prevX)
+                    {
+                        element.note.changeDuration(1);                
+                    } else {
+                        element.note.changeDuration(-1);
+                    }                
+                    drag.moved = true;
+                    drag.prevX = clientX;
+                }
+            }
+        }
+    }
+    
+    if ("addEventListener" in element) 
+    {
+        if (isIphone)
+        {
+            element.addEventListener("touchstart", startDrag, false);
+            element.addEventListener("touchend",   stopDrag,  false);
+            element.addEventListener("touchmove", doDrag,    false);
+            element.addEventListener("touchcancel", stopDrag,    false);        
+        }
+        else
+        {
+            element.addEventListener("mousedown", startDrag, false);
+            element.addEventListener("mouseup",   stopDrag,  false);
+            element.addEventListener("mousemove", doDrag,    false);
+            element.addEventListener("mouseout", stopDrag,    false);
+        }
+    }
+    else if ("attachEvent" in element) 
+    {
+        element.attachEvent("onmousedown", startDrag);
+        element.attachEvent("onmouseup",   stopDrag);
+        element.attachEvent("onmousemove", doDrag);
+        element.attachEvent("onmouseout", stopDrag);
+
+    }
+
+}
+
+
+function addClefEvents(element)
+{
+    var drag = { on: false, x: 0, y: 0};    
+
+    function startDrag(event)
+    {
+        //ensure events don't bubble up to staff
+        //event.cancelBubble=true;    
+        event.stopPropagation();
+        
+        drag.on = true;
+
+        if (isIphone)
+        {
+            event.preventDefault();
+            drag.x  = event.targetTouches[0].pageX;
+            drag.y  = event.targetTouches[0].pageY;
+            drag.prevX  = event.targetTouches[0].pageX;
+            drag.prevY  = event.targetTouches[0].pageY;
+        }
+        else
+        {
+            drag.x  = clientX;
+            drag.y  = clientY;
+            drag.prevX  = clientX;
+            drag.prevY  = clientY;
+        }
+    }
+
+    function stopDrag(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+        }
+        if (drag.on)
+        {
+            drag.on = false;
+        }
+
+    }
+
+    function doDrag(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+            var clientY = event.targetTouches[0].pageY;
+        }
+        else
+        {
+            var clientY = event.clientY;
+        }
+        if (drag.on)
+        {
+            //if y position has changed, change clef
+            //currently only bass and treble clefs supported, so drag up for treble and down for bass
+            if (clientY < (drag.y - dragTolerance) || clientY > (drag.y + dragTolerance))
+            {
+                if (clientY < drag.prevY)
+                {
+                    loadClef("treble");
+                } else {
+                    loadClef("bass");
+                }
+                drag.prevY = clientY;
+            }
+        }
+    }
+    
+    if ("addEventListener" in element) 
+    {
+        if (isIphone)
+        {
+            element.addEventListener("touchstart", startDrag, false);
+            element.addEventListener("touchend",   stopDrag,  false);
+            element.addEventListener("touchmove", doDrag,    false);
+            element.addEventListener("touchcancel", stopDrag,    false);        
+        }
+        else
+        {
+            element.addEventListener("mousedown", startDrag, false);
+            element.addEventListener("mouseup",   stopDrag,  false);
+            element.addEventListener("mousemove", doDrag,    false);
+            element.addEventListener("mouseout", stopDrag,    false);        
+        }
+    }
+    else if ("attachEvent" in element) 
+    {
+        element.attachEvent("onmousedown", startDrag);
+        element.attachEvent("onmouseup",   stopDrag);
+        element.attachEvent("onmousemove", doDrag);
+        element.attachEvent("onmouseout", stopDrag);
+
+    }
+
+}
+
+function makeStaffDraggable(element)
+{
+    var resizeDrag = { on: false, x: 0, y: 0};
+
+    function startResize(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+            var clientX = event.targetTouches[0].pageX;
+            var clientY = event.targetTouches[0].pageY;
+        }
+        else
+        {
+            var clientX = event.clientX;
+            var clientY = event.clientY;
+        }
+        resizeDrag.on = true;
+        resizeDrag.x  = clientX;
+        resizeDrag.y  = clientY;
+    }
+
+    function stopResize(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+        }
+
+        if (resizeDrag.on)
+        {
+            resizeDrag.on = false;
+        }
+    }
+
+    function doResize(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+        }
+        if (resizeDrag.on)
+        {
+            var xDiff = resizeDrag.x - clientX;
+            var staff = document.getElementById("staff");
+            //only width for now
+            var staffWidth = (parseInt(staff.style.width) > 0 ) ? 
+                        parseInt(staff.style.width) : defaultStaffWidth;
+            staff.style.width =  staffWidth - xDiff + "px";
+        }
+    }
+
+    function _widenStaff(event)
+    {
+        if (isIphone)
+        {
+            event.preventDefault();
+        }
+        widenStaff(20);
+    }
+    if ("addEventListener" in element) 
+    {
+//just widen on click for now    
+        if (isIphone)
+        {
+            element.addEventListener("touchstart", _widenStaff, false);
+        }
+        else
+        {
+            element.addEventListener("mousedown", _widenStaff, false);
+        }
+//        element.addEventListener("mousedown", startResize, false);
+//        element.addEventListener("mouseup",   stopResize,  false);
+//        element.addEventListener("mousemove", doResize,  false);
+//        element.addEventListener("mouseout", stopResize,  false);
+    }
+    else if ("attachEvent" in element) 
+    {
+    //just widen on click for now
+        element.attachEvent("onmousedown", _widenStaff);
+//        element.attachEvent("onmousedown", startResize);
+//        element.attachEvent("onmouseup",   stopResize);
+//        element.attachEvent("onmousemove", doResize);
+//        element.attachEvent("onmouseout", stopResize);
+    }
+}
+
+function widenStaff(addX)
+{
+    if (addX <= 0)
+    {
+        addX = 20;
+    }
+    
+    var staff = document.getElementById("staff");
+    var staffWidth = (parseInt(staff.style.width) > 0 ) ? 
+                parseInt(staff.style.width) : defaultStaffWidth;
+    staff.style.width =  staffWidth + addX + "px";
+
+}
+
+function loadClef(clefName) {
+    var clef = document.getElementById("clef");
+    //TODO: change notes to match new clef 
+    clefActive = clefName;
+    clef.className = "clef_" + clefName;
+}
+
+//currently unused and a little buggy, should use
+//element.note object reference instead
+function findNoteById(noteId) 
+{
+    
+    for (var i=0; i<notes.length; i++)
+    {
+        if (notes[i].id == noteId)
+        {
+            return note;
+        }
+    }
+    return false;
+}
+
+function findNoteIdxById(noteId) 
+{
+    for (var i=0; i<notes.length; i++)
+    {
+        if (notes[i].id == noteId)
+        {
+            return i;
+        }
+    
+    }
+    
+    return -1;
+}
+
+function doLoad() {
+    if (isIphone)
+    {
+        dragTolerance = 7;
+        noteWidth = 15;
+    }
+    else
+    {
+        document.getElementById("exportNotelistButton").style.visibility = "visible";
+        document.getElementById("playButton").style.visibility = "visible";
+    }
+    addStaffEvents(document.getElementById("staff"));
+    makeStaffDraggable(document.getElementById("staff_resize"));
+    loadClef(clefActive);
+    addClefEvents(document.getElementById("clef"));
+}
+
+notes = new Array();
+
+function midiNoteIdx(midiNoteNum)
+{
+//C    C#    D     D#    E    F    F#    G    G#    A    A#    B
+// 0    1    2    3     4    5     6    7    8    9    10    11
+//only sharps for now
+  return midiNoteNum % 12;
+}
+function midiNoteOctave(midiNoteNum)
+{
+  return Math.floor(midiNoteNum / 12) - 1;
+}
+
+function InputNote(x, y, isRest) {
+    this.isRest = isRest;
+    this.id = "note" + noteId++;
+    this.x = x;
+    this.typeIndex = 2;
+    this.dots = 0;
+    this.type = noteTypes[this.typeIndex];
+    
+    if (!isRest)
+    {
+        this.y = snapToGrid(y);
+        this.midiNoteNum = getMidiNote(y);
+        this.octave = midiNoteOctave(this.midiNoteNum);
+        this.noteNameSharp = noteNamesSharp[midiNoteIdx(this.midiNoteNum)];
+        this.noteNameFlat = noteNamesFlat[midiNoteIdx(this.midiNoteNum)];
+        this.isPitchAltered = notePitchAlterations[midiNoteIdx(this.midiNoteNum)];
+        this.isSharp = false;
+        this.isFlat = false;
+        this.noteNameLinePosChange = noteNameLinePosChange[midiNoteIdx(this.midiNoteNum)];
+        this.noteNameLinePosChangeFlat = noteNameLinePosChangeFlat[midiNoteIdx(this.midiNoteNum)];
+    } else {
+        //set fixed y position for rests, based on duration
+        this.y = 30;
+    }
+    
+    //add to DOM
+    var note = document.createElement("div");    
+    note.style.left  = this.x;
+    note.style.top  = this.y;
+    if (!isRest)
+    {
+        note.className = isStemUp(this.y) ? "note_" + this.type +"_stem_up" : "note_" +  this.type + "_stem_down";
+    } else {
+        note.className = "rest_" + this.type;
+    }
+    note.setAttribute ("id", this.id);
+    this.domRef = note;
+    //add a reference back to the object
+    this.domRef.note = this;
+    this.ledgerLineDomRefs = new Array();
+    this.dotDomRefs = new Array();
+    this.setX = function setX(x)
+        {
+            this.x = x;
+            this.domRef.style.left = this.x;
+            //reposition flats, sharps, duration dots, and ledger lines
+            if (this.flatDomRef)
+            {
+                this.flatDomRef.style.left = this.x;
+            } 
+            if (this.sharpDomRef)
+            {
+                this.sharpDomRef.style.left = this.x;
+            }             
+            if (this.ledgerLineDomRefs.length > 0) 
+            {
+                for (var i = 0; i < this.ledgerLineDomRefs.length; i++)
+                {
+                    if (this.ledgerLineDomRefs[i])
+                    {
+                        this.ledgerLineDomRefs[i].style.left = this.x;
+                    }
+                }
+            }
+            //TODO fix this to support multiple dots
+            if (this.dotDomRefs.length > 0) 
+            {
+                for (var i = 0; i < this.dotDomRefs.length; i++)
+                {
+                    if (this.dotDomRefs[i])
+                    {
+                        this.dotDomRefs[i].style.left = this.x;
+                    }
+                }
+            }
+        };    
+
+    this.setY = function setY(y)
+        {
+            this.y = y;
+            this.domRef.style.top = this.y;
+            //make sure stem is facing correct direction
+            this.domRef.className = isStemUp(this.y) ? "note_" + this.type +"_stem_up" : "note_" +  this.type + "_stem_down";
+            //move dots if necessary, simply remove and re-add
+            if (this.dots > 0)
+            {
+                var numDots = this.dots;
+                this.removeDots();
+                this.changeDots(numDots);
+            }            
+        };    
+
+    this.changeDuration = function changeDuration(changeVal)
+        {
+            this.typeIndex += changeVal;
+            if (this.typeIndex <= 0)
+            {
+                this.typeIndex = 0;
+            } else if (this.typeIndex > (noteTypes.length - 1))
+            {
+                this.typeIndex = (noteTypes.length - 1);
+            }
+            
+            var lastType = this.type;
+            this.type = noteTypes[this.typeIndex];
+            if (lastType != this.type)
+            {
+                if (!this.isRest)
+                {
+                    this.domRef.className = isStemUp(this.y) ? "note_" + this.type +"_stem_up" : "note_" +  this.type + "_stem_down";
+                } else {
+                    //rest
+                    this.domRef.className = "rest_" + this.type;
+                }
+                
+                //move dots if necessary, simply remove and re-add
+                if (this.dots > 0)
+                {
+                    var numDots = this.dots;
+                    this.removeDots();
+                    this.changeDots(numDots);
+                }
+                
+            }
+        };
+
+    this.removeDots = function removeDots()
+        {
+            if (this.dotDomRefs.length > 0) 
+            {
+                var staff = document.getElementById("staff");
+                for (var i = 0; i < this.dotDomRefs.length; i++)
+                {
+                    staff.removeChild(this.dotDomRefs[i]);
+                }
+                this.dotDomRefs = new Array();
+            }    
+        };
+    this.changeDots = function changeDots(changeVal)
+        {
+            this.dots += changeVal;
+            //only support 1 dot for now
+            this.dots = (this.dots >= 1)? 1 : 0;
+
+            if (this.dots == 0)
+            {
+                this.removeDots();
+                return;
+            }
+            var dot = document.createElement("div");
+            dot.style.top = this.domRef.style.top;    
+            dot.style.left = this.domRef.style.left;
+            //special case, just set half note to quarter note style
+            var dotNoteType = (this.type == "half")? dotNoteType = "quarter" : dotNoteType = this.type;
+            dot.className = isPosOnLine(this.y)? "dot_line_" + dotNoteType: "dot_space_" + dotNoteType;
+            if (isStemUp(this.y) && (dotNoteType=="16th" || dotNoteType=="eighth"))
+            {
+                dot.className += "_stem_up";
+            }
+            dot.setAttribute ("id", "dot_" + this.id);
+            var staff = document.getElementById("staff");            
+            staff.appendChild(dot);
+            this.dotDomRefs[this.dotDomRefs.length] = dot;            
+        };
+
+    this.changePitch = function changePitch(changeVal)
+        {
+            this.removeSharp();
+            this.removeFlat();
+            var lastMidiNoteNum = this.midiNoteNum;
+            this.midiNoteNum -= changeVal;
+            this.octave = midiNoteOctave(this.midiNoteNum);
+            this.noteNameSharp = noteNamesSharp[midiNoteIdx(this.midiNoteNum)];
+            this.noteNameFlat = noteNamesFlat[midiNoteIdx(this.midiNoteNum)];
+            this.isPitchAltered = notePitchAlterations[midiNoteIdx(this.midiNoteNum)];
+            this.noteNameLinePosChange = noteNameLinePosChange[midiNoteIdx(this.midiNoteNum)];
+            this.noteNameLinePosChangeFlat = noteNameLinePosChangeFlat[midiNoteIdx(this.midiNoteNum)];
+            
+            //TODO: make this math a little more sensicle
+            var newY = (((this.noteNameLinePosChange * lineHeight) - (centerOctave[clefActive] - this.octave) * octaveHeight) - centerOctavePos[clefActive]) * -1;
+            if (this.isPitchAltered) {
+                if (this.midiNoteNum > lastMidiNoteNum)
+                {
+                    this.removeFlat();
+                    this.addSharp();
+                } else if (this.midiNoteNum < lastMidiNoteNum)
+                {
+                    //change y positioning for flats
+                    newY = (((this.noteNameLinePosChangeFlat * lineHeight) - (centerOctave[clefActive] - this.octave) * octaveHeight) - centerOctavePos[clefActive]) * -1;
+                    this.removeSharp();
+                    this.addFlat();
+                }
+            } 
+            else {
+                this.removeSharp();
+                this.removeFlat();
+            }
+
+            //add ledger lines
+            if (newY >= ledgerLinePosMax && isPosOnLine(newY))
+            {
+                this.addLedgerLine("bottom");
+            } else if (newY <= ledgerLinePosMin && isPosOnLine(newY))
+            {
+                this.addLedgerLine("top");
+            }
+            //remove all ledger lines if new position is within staff
+            if (newY < ledgerLinePosMax && newY > ledgerLinePosMin)
+            {
+                this.removeLedgerLines();            
+            }
+            this.setY(newY);
+            playNote(this);
+        };
+
+    this.addSharp = function addSharp()
+        {
+            this.isSharp = true;
+            var sharp = document.createElement("div");
+            sharp.style.top = this.domRef.style.top;    
+            sharp.style.left = this.domRef.style.left;
+            sharp.className = "sharp";
+            sharp.setAttribute ("id", "sharp" + this.id);
+            var staff = document.getElementById("staff");            
+            staff.appendChild(sharp);
+            this.sharpDomRef = sharp;
+        }
+    this.removeSharp = function removeSharp()
+        {
+            this.isSharp = false;
+            if (this.sharpDomRef) 
+            {
+                var staff = document.getElementById("staff");            
+                staff.removeChild(this.sharpDomRef);
+                this.sharpDomRef = null;
+            }
+        }
+
+    this.addFlat = function addFlat()
+        {
+            this.isFlat = true;
+            var flat = document.createElement("div");
+            flat.style.top = this.domRef.style.top;    
+            flat.style.left = this.domRef.style.left;
+            flat.className = "flat";
+            flat.setAttribute ("id", "flat" + this.id);
+            var staff = document.getElementById("staff");            
+            staff.appendChild(flat);
+            this.flatDomRef = flat;
+        }
+    this.removeFlat = function removeFlat()
+        {
+            this.isFlat = false;
+            if (this.flatDomRef) 
+            {
+                var staff = document.getElementById("staff");            
+                staff.removeChild(this.flatDomRef);
+                this.flatDomRef = null;
+            }
+        }
+
+    this.addLedgerLine = function addLedgerLine(staffRelation)
+        {
+            var ledgerLine = document.createElement("div");
+            ledgerLine.style.top = this.domRef.style.top;    
+            ledgerLine.style.left = this.domRef.style.left;
+            ledgerLine.className = "ledger_line_" + staffRelation;
+            ledgerLine.setAttribute ("id", "ledgerLine" + this.id);
+            var staff = document.getElementById("staff");            
+            staff.appendChild(ledgerLine);
+            this.ledgerLineDomRefs[this.ledgerLineDomRefs.length] = ledgerLine;
+        }
+    this.removeLedgerLines = function removeLedgerLine()
+        {
+            if (this.ledgerLineDomRefs.length > 0) 
+            {
+                var staff = document.getElementById("staff");
+                for (var i = 0; i < this.ledgerLineDomRefs.length; i++)
+                {
+                    staff.removeChild(this.ledgerLineDomRefs[i]);
+                }
+                this.ledgerLineDomRefs = new Array();
+            }
+        }
+
+    this.remove = function remove()
+        {
+            var noteIdx = findNoteIdxById(this.id);
+            if (noteIdx >= 0)
+            {
+                notes.splice(noteIdx, 1);
+            }
+
+            //remove from DOM
+            var staff = document.getElementById("staff");
+            if (this.domRef)
+            {
+                staff.removeChild(this.domRef);
+            }
+            this.removeSharp();
+            this.removeFlat();
+            this.removeLedgerLines();
+            this.removeDots();
+            //respace
+            respaceNotes();
+        }
+
+    
+    //add to array of notes objects
+    notes.push(this);
+    return this;
+    
+
+}
+  
+//bubble sort notes, based on x position
+function sortNotes()
+{
+    var tempNote;
+    // simple bubble sort 
+    for (var i=0; i<(notes.length - 1); i++)
+    {
+        for (var j=i+1;j<notes.length; j++)
+        {
+            if (notes[j].x < notes[i].x) 
+            {
+                tempNote = notes[i];
+                notes[i] = notes[j];
+                notes[j] = tempNote;
+            }
+        }
+    }
+
+}
+
+
+function respaceNotes() 
+{
+    //order by current spacing,
+    sortNotes();
+    var x = staffPaddingX;
+    var x = staffPaddingX;    
+    for (var i = 0; i < notes.length; i++)
+    {
+        if (notes[i])
+        {
+            x += noteWidth + noteSpacingX;
+            notes[i].setX(x);
+        }
+        
+    }
+
+    var staff = document.getElementById("staff");
+    var staffWidth = (parseInt(staff.style.width) > 0 ) ? 
+                parseInt(staff.style.width) : defaultStaffWidth;
+                    
+    if (x > staffWidth) 
+    {
+        widenStaff(x - staffWidth);
+    }
+
+
+}
+ 
+/* notelist export */
+notelistIdxClefs = new Array();
+notelistIdxClefs["treble"] = 3;
+notelistIdxClefs["bass"] = 10;
+
+notelistAccidentalMap = new Array();
+notelistAccidentalMap["flat"] = 2;
+notelistAccidentalMap["natural"] = 3;
+notelistAccidentalMap["sharp"] = 4;
+
+/*                            ("whole", "half", "quarter", "eighth", "16th");*/
+noteIdxNotelist = new Array(2,     3,       4,         5,       6);
+timesNotelist = new Array(1920,  960,     480,       240,     120);
+var metricValues = new Array(4,        2,     1,      0.5,      .25);
+
+
+//capture graphical representation into another form...
+function exportNotelist() 
+{
+    var notelist = "%%Notelist-V2 file='exported from dhtml noteinput'  partstaves=1 0 startmeas=1\n" +
+    "C stf=1 type=" + notelistIdxClefs[clefActive] + "\n" +
+    "K stf=1 KS=0 #\n";
+    var time = 0;
+    var eAcc = 3;
+    var acc = 0;
+    for (var i=0; i<notes.length; i++)
+    {
+        var note = notes[i];
+        
+        if (note.isSharp)
+        {
+            acc = 4;
+            eAcc = 4;
+        } else if (note.isFlat)
+        {
+            acc = 2;
+            eAcc = 2;
+        } else {
+            acc = 0;
+            eAcc = 3;
+        }
+
+        if (!note.isRest)
+        {
+            /* N t=0 v=1 npt=1 stf=1 dur=4 dots=0 nn=60 acc=0 eAcc=3 pDur=456 vel=75 ...... appear=1*/
+            notelist += "N t=" + time + " v=1 npt=1 stf=1 dur=" + noteIdxNotelist[note.typeIndex] + " dots=" + note.dots + " nn=" + note.midiNoteNum +
+            " acc=" + acc + " eAcc=" + eAcc + " pDur=" + (timesNotelist[note.typeIndex] * 0.95) +  " vel=75 ...... appear=1\n";
+        } else 
+        {
+            /*R t=3840 v=1 npt=1 stf=1 dur=6 dots=0 ...... appear=1 */        
+            notelist += "R t=" + time + " v=1 npt=1 stf=1 dur=" + noteIdxNotelist[note.typeIndex] + " dots=" + note.dots + " ...... appear=1\n";
+        }
+        
+        
+        time += timesNotelist[note.typeIndex];
+    }
+    
+    //tack a barline on the end
+    notelist +=  "/ t=" + time + " type=1";
+    
+    var notelistPane = document.getElementById("notelist");
+    notelistPane.innerHTML = "<pre>" + notelist + "</pre>";    
+}
+
+/*
+ * Play back entire score using pdqm.us
+ */
+function play() 
+{
+    var tempo = 120;
+    var clef = notelistIdxClefs[clefActive];
+    var metricOnset = 0;
+    var playbackNotes = [];
+    
+    for (var i = 0; i < notes.length; i++)
+    {
+        var note = notes[i];
+
+        if (!note.isRest)
+        {
+            playbackNotes.push(playbackNoteFromInputNote(note, metricOnset, tempo));
+        }
+
+        metricOnset += metricValues[note.typeIndex];
+    }
+    
+    var audioSequence = new pdqmus.AudioSequence(playbackNotes, pdqmus.Wave.OSC_SAWTOOTH, 
+                                          pdqmus.Envelope.DEFAULT_ENVELOPE,
+                                          '../..');
+                       
+    //TODO: fix asynch playback (WebWorker include file broken in Firefox)                                                         
+    audioSequence.play(true);
+        
+}
+
+
+function playbackNoteFromInputNote(note, metricOnset, tempo)
+{
+    var playbackNote = new pdqmus.Note(null, null, note.midiNoteNum, pdqmus.Note.DEFAULT_VELOCITY, 
+                                false, metricOnset, (metricValues[note.typeIndex] * 0.90));
+    playbackNote.convertFromMetric(tempo);
+    return playbackNote;
+}
+
+function playNote(note) 
+{
+    var tempo = 120;
+    var metricOnset = 0;
+    var playbackNote = new pdqmus.Note(0, 0.2, note.midiNoteNum, pdqmus.Note.DEFAULT_VELOCITY);
+            
+    var audioSequence = new pdqmus.AudioSequence([playbackNote], pdqmus.Wave.OSC_SAWTOOTH, 
+                                          pdqmus.Envelope.DEFAULT_ENVELOPE,
+                                          '../..');
+                                        
+    audioSequence.play();        
+}
+</script>
+</head>
+<body onload="doLoad();" oncontextmenu="return false;">
+<div id="staff">
+    <div id="clef"></div>
+    <div id="staff_resize"></div>
+</div>
+<br/><br/>
+<form action="#">
+<input type="button" onclick="exportNotelist()" value="export notelist" style="visibility:hidden;" id="exportNotelistButton">
+<input type="button" onclick="play()" value="play" style="visibility:hidden;" id="playButton">
+</form>
+<div id="notelist">
+
+</div>
+
+
+<!-- preload images -->
+
+<div id="preload" style="visibility:hidden;">
+    <div class="note_whole_stem_up" style="visibility:hidden;">&nbsp;</div>
+    <div class="note_whole_stem_down" style="visibility:hidden;">&nbsp;</div>
+    <div class="note_half_stem_up" style="visibility:hidden;">&nbsp;</div>
+    <div class="note_half_stem_down" style="visibility:hidden;">&nbsp;</div>
+    <div class="note_quarter_stem_up" style="visibility:hidden;">&nbsp;</div>
+    <div class="note_quarter_stem_down" style="visibility:hidden;">&nbsp;</div>
+    <div class="note_eighth_stem_up" style="visibility:hidden;">&nbsp;</div>
+    <div class="note_eighth_stem_down" style="visibility:hidden;">&nbsp;</div>
+    <div class="note_16th_stem_up" style="visibility:hidden;">&nbsp;</div>
+    <div class="note_16th_stem_down" style="visibility:hidden;">&nbsp;</div>
+    <div class="note_32nd_stem_up" style="visibility:hidden;">&nbsp;</div>
+    <div class="note_32nd_stem_down" style="visibility:hidden;">&nbsp;</div>
+    <div class="rest_whole" style="visibility:hidden;">&nbsp;</div>
+    <div class="rest_half" style="visibility:hidden;">&nbsp;</div>
+    <div class="rest_quarter" style="visibility:hidden;">&nbsp;</div>
+    <div class="rest_eighth" style="visibility:hidden;">&nbsp;</div>
+    <div class="rest_16th" style="visibility:hidden;">&nbsp;</div>
+    <div class="clef_treble" style="visibility:hidden;">&nbsp;</div>
+    <div class="clef_bass" style="visibility:hidden;">&nbsp;</div>
+    <div class="sharp" style="visibility:hidden;">&nbsp;</div>
+    <div class="flat" style="visibility:hidden;">&nbsp;</div>
+    <div class="ledger_line_top" style="visibility:hidden;">&nbsp;</div>
+    <div class="ledger_line_bottom" style="visibility:hidden;">&nbsp;</div>
+    <div class="dot" style="visibility:hidden;">&nbsp;</div>
+</div>
+</body>
+</html>

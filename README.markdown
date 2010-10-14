@@ -4,6 +4,8 @@ pdqm.us (Pretty Damn Quick Music) is a Javascript library for creating browser-b
 
 It's currently in a larval state, so please keep your expectations low, but do expect the API to change. Many things are incomplete and likely broken, but that shouldn't prevent you from having some fun with it.
 
+Includes JSDoc and both Komodo and Aptana projects.
+
 name
 ----
 The name is a nod to PDQ Bach. Umm… like … uh … because JS stands for both Javascript and Johann Sebastian. Get it?

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>pdqmus demos</title>
+<style type="text/css">
+body
+{
+    font-family: helvetica, verdana, sans-serif; 
+}
+h1
+{
+   margin-left: 30px;
+   color: #c53;
+}
+.section
+{
+    border: 3px solid #c53;    
+    -moz-border-radius: 5px;
+    border-radius: 5px;    
+    width: 90%;
+    padding: 0;
+    margin: 4px;
+    margin-bottom: 8px;
+    min-width: 600px;
+}
+h2
+{
+    opacity: 0.9;
+    margin: 0;
+    padding: 0;
+    background: #c53;
+    color: white;
+    padding: 8px;
+}
+
+a
+{
+    background: white;
+    color: #c53;
+    text-decoration: none;
+    border: 2px solid #235;                    
+    -moz-border-radius: 5px;
+    border-radius: 5px;   
+    padding: 3px 5px 0px 5px;
+    margin-left: 10px; 
+}
+
+li
+{
+    margin-top: 12px;
+    list-style-type: none;
+}
+p
+{
+    margin: 10px;
+}
+pre
+{
+    font-size: 12px;
+}
+</style>
+</head>
+<body>
+<h1>pdqm.us</h1>
+<div class="section">
+    <h2>what is this?</h2>
+    <p>pdqm.us (Pretty Damn Quick Music) is a Javascript library for creating browser-based music applications.
+    No plugins required.  No server required.</p>
+    <p>It's currently in a larval state, so please keep your expectations low, but do expect the API to change.  
+    Many things are incomplete and likely broken, but that shouldn't prevent you from having some fun with it.</p>
+
+</div>
+<div class="section">
+    <h2>name</h2>
+    <p>The name is a nod to PDQ Bach. Umm&hellip; like &hellip; uh &hellip; because JS stands for both Javascript and Johann Sebastian. Get it?</p>
+    <p>The &quot;Q&quot; refers to the quickness of development, not performance.  On the contrary, performance may be very low.</p>
+</div>
+<div class="section">
+    <h2>hello, world     <a href="hello_world.html">run</a></h2>
+    <pre>
+    //middle c, with a duration of 1 second
+    var notes = [new pdqmus.Note(0, 1, 60)];
+
+    //create and play MIDI  
+    var midi = new pdqmus.Midi();
+    midi.addTrack(notes);
+    midi.play();
+
+    //create and play audio
+    var audioSequence = new pdqmus.AudioSequence(notes);
+    audioSequence.play();
+
+    //draw a piano roll
+    var pianoRoll = new pdqmus.PianoRoll(notes);
+    pianoRoll.draw();
+    </pre>
+</div>
+<div class="section">
+    <h2>hello, solar system <a href="hello_solar_system.html">run</a></h2>
+    <pre>
+    //middle c, d, e with a duration of a 1/4 second, varying velocities
+    var notes = [new pdqmus.Note(0.00, 0.25, 60, 20),
+                 new pdqmus.Note(0.25, 0.25, 62, 50),
+                 new pdqmus.Note(0.50, 0.50, 64, 102)];
+    
+    //create and play MIDI  
+    var midi = new pdqmus.Midi();
+    midi.addTrack(notes);
+    midi.play();
+    
+    //create and play audio using a sawtooth wave and envelope shaping
+    var audioSequence = new pdqmus.AudioSequence(notes, pdqmus.Wave.OSC_SAWTOOTH, 
+                                          pdqmus.Envelope.DEFAULT_ENVELOPE);
+    audioSequence.play();
+    
+    //draw and playback a piano roll, at a larger x scale
+    var pianoRoll = new pdqmus.PianoRoll(notes, 50);
+    pianoRoll.draw();
+    pianoRoll.play();
+    
+    //draw wave form
+    audioSequence.drawWaveform();
+    
+    //create a 60 BPM looping sequencer containing the MIDI and audio
+    var sounds = [MidiSound.createFromUrl(midi.getDataUrl()),
+                  pdqmus.Sample.createFromUrl(audioSequence.getDataUrl())];
+    sequencer = new pdqmus.Sequencer(sounds, 60);
+    sequencer.draw();
+    sequencer.play();    
+
+    </pre>
+</div>
+<div class="section">
+    <h2>documentation</h2>
+    <p><a href="jsdoc/index.html">JSDoc here</a></p>
+</div>
+<div class="section">
+    <h2>download</h2>
+    <p>see the <a href="http://github.com/chirgwin/pdqmus">Github repository</a></p>
+</div>
+<div class="section">
+    <h2>various demos</h2>
+    <ul>
+    <li><a href="demos/poor_mans_theremin/index.html">Poor Man's 2-D Theremin</a></li>
+    <li><a href="demos/wave_form_visual/index.html">Wave Form Visualization</a></li>
+    <li><a href="demos/drumshitup/index.html">Sequencing: Drum Shit Up</a></li>
+    <li><a href="demos/draw_piano_roll/index.html">Draw Piano Roll</a></li>
+    <li><a href="demos/random_piano_rolls/index.html">Rolls Without Lifting a Finger</a></li>
+    <li><a href="demos/tap_dat_beat/index.html">BPM tapper + Metronome</a></li>
+    <li><a href="demos/noteinput/index.html">Gestural Music Notation</a></li>
+    </ul>
+</div>
+<div class="section">
+    <h2>known limitations</h2>
+    <ul>
+    <li>Chrome: MIDI, Audio don't work at all</li>
+    <li>Safari 5: MIDI doesn't work at all</li>
+    <li>Firefox 4: MIDI doesn't work at all</li>
+    </ul>
+</div>
+<div class="section">
+    <h2>credits</h2>
+    <p>
+    Geoff Chirgwin<br/>
+    October 2010<br/>
+    Brooklyn, New York<br/>
+    </p>
+</div>
+<div class="section">
+    <h2>acknowledgements</h2>
+    <p>
+    Serious props to these guys for their work on this kind of stuff:
+    </p>
+    <ul>
+        <li>Theodore Surgent's <a href="http://slickjs.org/node/52">Auxlib synth</a></li>
+        <li>Steven Wittens' <a href="http://acko.net/files/audiosynth/index.html">JS Audio Synth</a></li>
+    </ul>
+
+</div>
+
+
+</body>
+</html>

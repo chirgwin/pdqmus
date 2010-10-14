@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tap Dat Beat</title>
+<!-- pdqmus -->    
+<script type="text/javascript" src="../../pdqmus.js"></script>
+<script type="text/javascript" src="../../Sound.js"></script>
+<script type="text/javascript" src="../../Sample.js"></script>
+<script type="text/javascript" src="../../Util.js"></script>
+<script type="text/javascript" src="../../Wave.js"></script>
+<script type="text/javascript">
+document.addEventListener("mousedown", handleTap, false);
+var firstTap = 0, prevTap = 0, numTaps = 0;
+var times = [];
+var bpm = 0;
+var timeoutLoop;
+function handleTap(event)
+{	
+    beat.pause();
+    clearTimeout(timeoutLoop);
+    beatOn();
+	var now = new Date();
+	prevTap = now.getTime();
+
+	if (firstTap == 0)
+		firstTap = prevTap;
+	
+	numTaps++;
+
+    if (numTaps > 1)
+	{
+        bpm = Math.round((numTaps / ((prevTap - firstTap) / 1000 / 60)));
+		document.getElementById("bpm").innerHTML = bpm + " bpm";
+        timeoutLoop = setTimeout(loop,  ((60 / bpm * 1000) * 2));
+	}
+}
+
+function beatOn()
+{
+    beat.play();
+    setTimeout(beatOff);
+    document.getElementById("bpm").style.color = "white";
+    document.getElementById("bpm").style.background = "#c53";
+    setTimeout(beatOff, 100);
+}
+
+function beatOff()
+{
+    document.getElementById("bpm").style.color = "#c53";
+    document.getElementById("bpm").style.background = "white";    
+}
+
+function loop()
+{
+    beatOn();
+    
+    timeoutLoop = setTimeout(loop, 60 / bpm * 1000);
+}
+
+var beatWave = new pdqmus.Wave();
+beatWave.render(1, 0.05, 0.5, pdqmus.Wave.OSC_NOISE);
+beatWave.filterSineDistortion(10);
+var beat = pdqmus.Sample.createFromUrl(beatWave.getDataUrl());
+
+</script>
+<style type="text/css">
+#bpm
+{
+    font-size: 200px;
+    font-family: helvetica, sans-serif;
+    color: #C53;
+}
+</style>
+</head>
+<body>
+<div id="bpm"></div>
+</body>
+</html>

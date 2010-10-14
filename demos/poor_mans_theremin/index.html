@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Poor Man's 2-dimensional Theremin</title>
+<style type="text/css">
+    body
+    {
+        margin: 0;
+        padding: 0;
+        font-family: Verdana, Helvetica, Arial, sans-serif;
+    }
+    #canvasView 
+    {
+        height: 100%; 
+        width: 100%;
+        float: top;
+    }
+
+</style>
+<!-- pdqmus -->    
+<script type="text/javascript" src="../../pdqmus.js"></script>
+<script type="text/javascript" src="../../Util.js"></script>
+<script type="text/javascript" src="../../Sound.js"></script>
+<script type="text/javascript" src="../../Sample.js"></script>
+<script type="text/javascript" src="../../Wave.js"></script>
+
+<script type="text/javascript">
+<!--
+
+//globals
+var fingerIsDown = false;
+var cursorPoint = {};
+var wave = new pdqmus.Wave();
+//duration of each note, in seconds
+var duration = 0.15;
+var frequency = 0;
+var volume = 0;
+function handleOnLoad()
+{        
+    window.onresize = setCanvasScale;
+    //set initial scale
+    setCanvasScale();
+    var canvasView = document.getElementById("canvasView");
+    canvasView.addEventListener("mousedown", handleFingerDown, "false");
+    canvasView.addEventListener("mousemove", handleFingerMove, "false");
+    canvasView.addEventListener("mouseup", handleFingerUp, "false");
+}  
+
+function handleFingerDown(event)
+{
+    fingerIsDown = true;
+    cursorPoint = pdqmus.Util.getPosition(event);
+    playSound();
+    setTimeout(drawCursor, 10);
+}
+
+function handleFingerMove(event)
+{
+    cursorPoint = pdqmus.Util.getPosition(event);
+    if (fingerIsDown) 
+    {
+        clearCanvas();
+        drawCursor();
+    }
+}
+
+function handleFingerUp(event)
+{
+    clearCanvas();
+    fingerIsDown = false;
+}
+
+function clearCanvas()
+{
+    var canvasView = document.getElementById("canvasView");
+    var context = canvasView.getContext("2d")
+    context.clearRect (0, 0,  canvasView.width, canvasView.height);
+}
+// draw a square cursor
+function drawCursor()
+{
+    var canvasView = document.getElementById("canvasView");
+    var context = canvasView.getContext("2d");
+    
+    //set opacity to correspond to loudness
+    context.fillStyle = "rgba(200, 100, 50," + volume + ");";
+    var length = 60;
+    context.fillRect(cursorPoint.x - length, cursorPoint.y - length, length, length);    
+    context.fillStyle = "#fff";
+    context.font = "18px Helvetica";
+    context.textBaseline = "bottom";
+    context.fillText(Math.round(frequency) + " Hz", cursorPoint.x - length, cursorPoint.y )  
+}
+
+
+//resize canvas to fit screen
+function setCanvasScale()
+{    
+    var canvasView = document.getElementById("canvasView");
+    canvasView.width  = window.innerWidth;
+    canvasView.height = window.innerHeight;
+}
+
+function playSound()
+{
+    var canvasView = document.getElementById("canvasView");
+    
+    //scale x position to 0..1 for volume
+    volume = cursorPoint.x / canvasView.width;
+    //1KHz high frequency
+    var highFrequency = 1000;
+    
+    //scale to height of canvas (low to high, bottom to top)
+    frequency = ((canvasView.height - cursorPoint.y) / canvasView.height * highFrequency);
+    wave.clearData();
+    //render wave    
+    wave.render(frequency, duration, volume, pdqmus.Wave.OSC_SAWTOOTH);
+    wave.envelope(new pdqmus.Envelope(0.05, 0, 0.99, 0.05));
+
+    //play sound
+    var sample = pdqmus.Sample.createFromUrl(wave.getDataUrl());
+    sample.play();
+
+    //continue playing sound while finger is down    
+    if (fingerIsDown)
+    {
+        setTimeout(playSound, duration * 1000);
+    }
+}
+
+-->
+</script>
+
+</head>
+<body onload="handleOnLoad();">
+<canvas id="canvasView" width="400" height="400"></canvas>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- pdqmus -->    
+<script type="text/javascript" src="../../pdqmus.js"></script>
+<script type="text/javascript" src="../../Util.js"></script>
+<script type="text/javascript" src="../../Sound.js"></script>
+<script type="text/javascript" src="../../Sample.js"></script>
+<script type="text/javascript" src="../../Sequencer.js"></script>
+<script type="text/javascript" src="../../Wave.js"></script>
+<script type="text/javascript" src="../../Midi.js"></script>
+<script type="text/javascript" src="../../Notation.js"></script>
+<script type="text/javascript" src="../../Note.js"></script>
+<script type="text/javascript" src="../../MidiSound.js"></script>
+<style type="text/css">
+body
+{
+    font-family: Helvetica, Verdana, Arial, sans-serif;
+}
+
+.beatbox
+{
+    border: 3px solid #352;    
+    -moz-border-radius: 5px;
+    border-radius: 5px;    
+    width: 24px;
+    height: 24px;
+    margin: 4px;
+    float: left;
+}
+
+.beatOff
+{
+    background-color: white;
+}
+
+.beatOn
+{
+    background-color: #C53; 
+}
+
+.beatHighlighted
+{
+    border: 3px solid #3C5;   
+}
+
+#container
+{
+    width: 680px;
+    height: 380px;
+}
+
+#container .row
+{
+    width: 680px;
+}
+
+.downbeat
+{
+    margin-left: 24px;
+}
+
+.playButton
+{
+    width: 100px;
+    height: 40px;
+    border: 3px solid #352;
+    font-size: 20px; 
+    color: white;   
+    -moz-border-radius: 5px;
+    border-radius: 5px;        
+    background-color: #c53;  
+}
+</style>
+<script type="text/javascript">    
+
+var sequencer;
+
+function handleOnLoad()
+{        
+    //set up a couple of wave "files"
+    var wave1 = new pdqmus.Wave();
+    wave1.render(110, 0.05, 0.5, pdqmus.Wave.OSC_SAWTOOTH);
+    wave1.envelope(pdqmus.Envelope.DEFAULT_ENVELOPE);
+
+    var wave2 = new pdqmus.Wave();
+    wave2.render(55, 0.07, 1.0, pdqmus.Wave.OSC_SAWTOOTH);
+    wave2.envelope(pdqmus.Envelope.DEFAULT_ENVELOPE);
+    wave2.filterClippedDistortion();
+
+    var midi = new pdqmus.Midi();
+    midi.addTrack([new pdqmus.Note(0, 0.2, 90, 127)]);    
+         
+    var sounds = [
+                   //sounds can be samples based on local URLs
+                   pdqmus.Sample.createFromUrl("bang_01.wav"),
+    	           pdqmus.Sample.createFromUrl("bang_02.wav"),
+    	           pdqmus.Sample.createFromUrl("bang_03.wav"),
+    	           pdqmus.Sample.createFromUrl("bang_04.wav"),
+    	           pdqmus.Sample.createFromUrl("bang_05.wav"),
+
+    	           //remote URL
+    	           pdqmus.Sample.createFromUrl("http://www.clayloomis.com/Sounds/scotty1.wav"),
+
+    	           //or a wave "file" generated on the fly    
+    	           pdqmus.Sample.createFromUrl(wave1.getDataUrl()),       
+    	           pdqmus.Sample.createFromUrl(wave2.getDataUrl()),
+
+    	           //or even a MIDI "file" generated on the fly
+    	           pdqmus.MidiSound.createFromUrl(midi.getDataUrl())
+                  ];
+    sequencer = new pdqmus.Sequencer(sounds, 132);
+    sequencer.render(document.getElementById("container"));
+    sequencer.play(); 
+}
+
+function handlePlayPause(buttonRef)
+{
+    if (sequencer.isPlaying)
+    {
+        sequencer.pause();
+        buttonRef.innerHTML = "play";
+    }
+    else
+    {
+        sequencer.play();
+        buttonRef.innerHTML = "pause";
+    }
+}
+
+</script>
+</head>
+<body onload="handleOnLoad();">
+  <h1>Drum. Shit. Up.</h1>
+  <div id="container">
+  </div>
+  <button class="playButton" onclick="handlePlayPause(this);">pause</button>
+</body>
+</html>

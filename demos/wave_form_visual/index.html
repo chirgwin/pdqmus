@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Waveform visual rendering</title>
+<!-- pdqmus -->    
+<script type="text/javascript" src="../../pdqmus.js"></script>
+<script type="text/javascript" src="../../Util.js"></script>
+<script type="text/javascript" src="../../Sound.js"></script>
+<script type="text/javascript" src="../../Sample.js"></script>
+<script type="text/javascript" src="../../Sequencer.js"></script>
+<script type="text/javascript" src="../../Wave.js"></script>
+<script type="text/javascript" src="../../Midi.js"></script>
+<script type="text/javascript" src="../../Notation.js"></script>
+<script type="text/javascript" src="../../Note.js"></script>
+<script type="text/javascript" src="../../MidiSound.js"></script>
+<script type="text/javascript" src="../../AudioSequence.js"></script>
+<style type="text/css">
+body
+{
+    font-family: Helvetica, Verdana, Arial, sans-serif;
+}
+
+.waveForm
+{
+    border: 2px dashed #352;
+    -moz-border-radius: 10px;
+    border-radius: 10px;  
+    margin-bottom: 20px;
+    padding: 20px;   
+   // background: #352 ; opacity: 0.7;       
+} 
+
+</style>
+<script type="text/javascript">    
+
+var sequencer;
+
+function handleOnLoad()
+{        
+    //set up a couple of wave "files"
+    drawWaveForm(pdqmus.Wave.OSC_SQUARE);
+    drawWaveForm(pdqmus.Wave.OSC_SINE);            
+    drawWaveForm(pdqmus.Wave.OSC_NOISE);
+    drawWaveForm(pdqmus.Wave.OSC_SILENCE);
+    drawWaveForm(pdqmus.Wave.OSC_TRIANGLE);
+    drawWaveForm(pdqmus.Wave.OSC_SAWTOOTH);
+}
+
+var wave = [];
+function drawWaveForm(type)
+{
+    wave[type] = new pdqmus.Wave();
+    wave[type].render(440, 0.2, 0.7, type);
+    wave[type].envelope(pdqmus.Envelope.DEFAULT_ENVELOPE);
+    wavCanvas = wave[type].renderVisual(800, 150, pdqmus.Wave.VISUAL_TYPE_DEFAULT, false, "#c53");
+    wavCanvas.className = "waveForm";
+    wavCanvas.id = type;
+    wavCanvas.addEventListener("mousedown", playWave, false);
+    var context = wavCanvas.getContext("2d");
+    context.font = "80px Helvetica";
+    context.globalCompositeOperation = "destination-out";
+    context.fillStyle = "#c53";
+    context.textBaseline = "middle";
+    context.fillText(type, 80, 69); 
+    var c = document.getElementById("container");
+    c.appendChild(wavCanvas);   
+    
+}
+
+function playWave(event)
+{
+    wave[event.target.id].play();
+}
+
+function handlePlayPause(buttonRef)
+{
+    if (sequencer.isPlaying)
+    {
+        sequencer.pause();
+        buttonRef.innerHTML = "play";
+    }
+    else
+    {
+        sequencer.play();
+        buttonRef.innerHTML = "pause";
+    }
+}
+
+</script>
+</head>
+<body onload="handleOnLoad();">
+  <h1>Waveform visual rendering (scratch n' sniff)</h1>
+  <div id="container">
+  </div>
+</body>
+</html>

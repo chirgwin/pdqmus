@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>hello world</title>
+<style type="text/css">
+body
+{
+    font-family: Helvetica, sans-serif;
+}
+
+</style>
+<!-- pdqmus -->    
+<script type="text/javascript" src="pdqmus.js"></script>
+<script type="text/javascript" src="Notation.js"></script>
+<script type="text/javascript" src="Note.js"></script>
+<script type="text/javascript" src="Util.js"></script>
+<script type="text/javascript" src="Midi.js"></script>
+<script type="text/javascript" src="Sound.js"></script>
+<script type="text/javascript" src="MidiSound.js"></script>
+<script type="text/javascript" src="PianoRoll.js"></script>
+<script type="text/javascript" src="Sample.js"></script>
+<script type="text/javascript" src="Wave.js"></script>
+<script type="text/javascript" src="AudioSequence.js"></script>
+
+<script type="text/javascript">
+<!--
+function helloWorld()
+{
+    //middle c, with a duration of 1 second
+    var notes = [new pdqmus.Note(0, 1, 60)];
+    
+    //create and play MIDI  
+    var midi = new pdqmus.Midi();
+    midi.addTrack(notes);
+    midi.play();
+    
+    //create and play audio
+    var audioSequence = new pdqmus.AudioSequence(notes);
+    audioSequence.play();
+    
+    //draw a piano roll
+    var pianoRoll = new pdqmus.PianoRoll(notes);
+    pianoRoll.draw();    
+}
+-->
+</script>
+
+</head>
+<body onload="helloWorld();">
+</body>
+
+</html>

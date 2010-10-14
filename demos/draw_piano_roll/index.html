@@ -1,0 +1,238 @@
+<html>
+<head>
+<title>Piano roll</title>
+<style type="text/css">
+body
+{
+    margin: 0;
+    padding: 0;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+}
+
+.pianoRoll
+{
+    border: 1px dotted #666;
+    position: absolute;        
+}
+
+#canvasView
+{
+    border: 5px dashed #352;
+    -moz-border-radius: 20px;
+    border-radius: 20px;            
+} 
+
+.playButton
+{
+    width: 100px;
+    height: 40px;
+    border: 3px solid #352;
+    font-size: 20px; 
+    color: white;   
+    -moz-border-radius: 5px;
+    border-radius: 5px;        
+    background-color: #C53;  
+}
+
+#controls
+{
+    border: 3px solid #352;
+    font-size: 20px; 
+    color: black;   
+    -moz-border-radius: 5px;
+    border-radius: 5px;        
+    background-color: #fff;  
+    float:bottom;
+    margin-top: 20px;
+    width: 300px;
+}
+
+
+</style>
+<!-- pdqmus -->    
+<script type="text/javascript" src="../../pdqmus.js"></script>
+<script type="text/javascript" src="../../Util.js"></script>
+<script type="text/javascript" src="../../Midi.js"></script>
+<script type="text/javascript" src="../../Notation.js"></script>
+<script type="text/javascript" src="../../Note.js"></script>
+<script type="text/javascript" src="../../Sound.js"></script>
+<script type="text/javascript" src="../../MidiSound.js"></script>
+<script type="text/javascript" src="../../PianoRoll.js"></script>
+<script type="text/javascript" src="../../Sample.js"></script>
+<script type="text/javascript" src="../../Wave.js"></script>
+<script type="text/javascript" src="../../AudioSequence.js"></script>
+
+<script type="text/javascript">
+<!--
+const WIDTH = 5;
+const FINGER_OFFSET = 15;
+const PLAYBACK_MODE_MIDI = "midi";
+const PLAYBACK_MODE_WAV = "audio";
+
+var mouseIsDown = false;
+var cursorPoint = {x:0,y:0};
+var cursorPointDown = {x:0,y:0};
+
+var canvas;
+var context;
+
+var playbackMode = PLAYBACK_MODE_MIDI;
+
+var notes = [];
+
+var playbackAudioSeq;
+
+const TOTAL_HEIGHT = 635;
+const TOTAL_WIDTH = 800;
+const MAX_NOTES = 127;
+
+function handleOnLoad()
+{        
+
+    canvas = document.getElementById("canvasView");
+    context = canvas.getContext("2d");
+
+    canvas.addEventListener("mousedown", handleMouseDown, false);
+    canvas.addEventListener("mousemove", handleMouseMove, false);
+    canvas.addEventListener("mouseup", handleMouseUp, false);
+
+}  
+
+function pitchFromPoint(point)
+{
+    return (MAX_NOTES - Math.round(point.y / WIDTH));
+}
+
+function handleMouseDown(event)
+{
+    mouseIsDown = true;
+    cursorPointDown = pdqmus.Util.getPosition(event);
+    
+    var playBackNotes = [new pdqmus.Note(0, 0.5, pitchFromPoint(cursorPointDown), 127)];
+    //pitch feedback
+    if (playbackMode == PLAYBACK_MODE_MIDI) 
+    {
+        var midi = new pdqmus.Midi();
+        midi.addTrack(playBackNotes)
+        midi.play();
+    }
+    else //WAV 
+    {
+        var as = new pdqmus.AudioSequence(playBackNotes, pdqmus.Wave.OSC_SQUARE, pdqmus.Envelope.DEFAULT_ENVELOPE);
+        as.play();        
+    }
+
+}
+
+function handleMouseMove(event)
+{
+    cursorPoint = pdqmus.Util.getPosition(event);
+    
+    if (mouseIsDown) 
+    {
+        context.beginPath();
+        context.lineWidth = WIDTH;
+        context.moveTo(cursorPointDown.x, cursorPointDown.y);
+        context.lineTo(cursorPoint.x, cursorPointDown.y);
+        context.stroke();
+        context.closePath();
+    }
+        
+}
+
+function handleMouseUp(event)
+{
+    mouseIsDown = false;
+    var duration = Math.abs(cursorPoint.x - cursorPointDown.x) / WIDTH / 10;
+    var onset = Math.min(cursorPoint.x, cursorPointDown.x) / WIDTH / 10;
+    if (duration == 0)
+    {
+        return;
+    }
+    context.save();
+    var newNote = new pdqmus.Note(onset, duration, pitchFromPoint(cursorPointDown), 127);
+    notes.push(newNote);
+}
+
+function clearCanvas()
+{
+    var canvasView = document.getElementById("canvasView");
+    var context = canvasView.getContext('2d')
+    context.clearRect (0, 0,  canvasView.width, canvasView.height);
+}
+
+
+
+function handlePlayStop(buttonRef)
+{
+    if (notes.length <= 0)
+    {
+        return false;
+    }
+    if (playbackMode == PLAYBACK_MODE_MIDI) 
+    {
+        var midi = new pdqmus.Midi();
+        midi.addTrack(notes);
+        midi.play();
+        renderCursor();    
+    }
+    else //WAV 
+    {
+        playbackAudioSeq = new pdqmus.AudioSequence(notes, pdqmus.Wave.OSC_SQUARE, pdqmus.Envelope.DEFAULT_ENVELOPE);
+        playbackAudioSeq.play(true);
+        document.getElementById("playButton").innerHTML = "working";
+        playbackAudioSeq.setStartCallback(startAudioPlayback);      
+    }
+}
+
+function startAudioPlayback()
+{
+    renderCursor();
+    playButton = document.getElementById("playButton");
+    playButton.innerHTML = "stop";
+    playButton.onclick = stopAudioPlayback;        
+}
+
+function stopAudioPlayback()
+{
+    playbackAudioSeq.stop();
+    document.getElementById("playButton").innerHTML = "play";    
+}
+
+var _cursorPosition = 5;
+function renderCursor()
+{
+    context.strokeStyle = "rgba(200, 100, 50, 0.01)";
+    context.moveTo(_cursorPosition, 10);
+    context.lineTo(_cursorPosition, TOTAL_HEIGHT - 10);    
+    context.stroke();
+    _cursorPosition ++;
+    if (_cursorPosition <= TOTAL_WIDTH - 5) 
+    {
+        setTimeout(renderCursor, 1000 / (WIDTH * 10));
+    }
+    context.restore();
+} 
+
+function changePlaybackType(radio)
+{
+    playbackMode = radio.value;    
+}
+
+-->
+
+
+</script>
+
+</head>
+<body onload="handleOnLoad();">
+<canvas id="canvasView" width="800" height="635"></canvas>
+<fieldset id="controls">
+MIDI<input type="radio" name="playbackType" value="midi" checked onclick="changePlaybackType(this);"/>
+Audio<input type="radio" name="playbackType" value="audio" onclick="changePlaybackType(this);"/>
+<button id="playButton" class="playButton" onclick="handlePlayStop(this);">play</button>
+
+</fieldset>
+
+</body>
+</html>
