@@ -46,7 +46,7 @@ pdqmus.XmlHttpRequest.READYSTATE_COMPLETE = 4;
 
 pdqmus.XmlHttpRequest.HTTP_STATUS_OK = 200;
 pdqmus.XmlHttpRequest.HTTP_STATUS_CREATED = 201;
-pdqmus.XmlHttpRequest.SUCCESS_STATUSES = [XmlHttpRequest.HTTP_STATUS_OK, pdqmus.XmlHttpRequest.HTTP_STATUS_CREATED];
+pdqmus.XmlHttpRequest.SUCCESS_STATUSES = [pdqmus.XmlHttpRequest.HTTP_STATUS_OK, pdqmus.XmlHttpRequest.HTTP_STATUS_CREATED];
 
 
 pdqmus.XmlHttpRequest.HEADER_CONTENT_TYPE = "Content-Type";

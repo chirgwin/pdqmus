@@ -511,7 +511,7 @@ pdqmus.Wave.PITCHED_OSCILLATORS = [
     pdqmus.Wave.OSC_SINE,
     pdqmus.Wave.OSC_SQUARE,
     pdqmus.Wave.OSC_TRIANGLE,
-    pdqmus.Wave.OSC_SAWTOOTH,    
+    pdqmus.Wave.OSC_SAWTOOTH
 ];
 
 pdqmus.Envelope = function(a, d, s, r)
@@ -528,7 +528,7 @@ pdqmus.RenderWaveMessage = function(notes, oscillatorType, envelope)
 {
     this.notes = notes
     this.oscillatorType = oscillatorType || pdqmus.Wave.OSC_DEFAULT;    
-    this.wave;
+    this.wave = null;
     this.envelope = envelope;
 }
 

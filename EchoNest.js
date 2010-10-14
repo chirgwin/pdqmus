@@ -6,7 +6,7 @@
  * @constructor
  * @this {pdqmus.EchoNest}
  * @param {string} apiKey Echo Nest API key
- * @param {function} loadedCallback function to call when api call is loaded
+ * @param {object} loadedCallback function to call when api call is loaded
  */
 
 pdqmus.EchoNest = function(apiKey, loadedCallback)
@@ -15,10 +15,10 @@ pdqmus.EchoNest = function(apiKey, loadedCallback)
     const DEFAULT_NUM_ROWS = 15;
     const DELIMITER = "/";
     this.apiKey = apiKey;
-    this.loadedCallback;
-    this.errorCallback;
+    this.loadedCallback = null;
+    this.errorCallback = null;
     this.method = "GET";
-    this.result;
+    this.result = null;
     this.useJsonp = false;
     var self = this;
 
@@ -40,14 +40,13 @@ pdqmus.EchoNest = function(apiKey, loadedCallback)
         {        
             parameters["format"] = "jsonp";
             parameters["callback"] = callback;
-            var url = Api.formUrl(BASE_URL + DELIMITER + api + DELIMITER + method, parameters);
-            Api.loadJsonp(url);            
+            var url = pdqmus.Api.formUrl(BASE_URL + DELIMITER + api + DELIMITER + method, parameters);
+            pdqmus.Api.loadJsonp(url);            
         }
         else
         {            
             parameters["format"] = "json";        
-            var url = Api.formUrl(Api.PROXY_URL + BASE_URL + DELIMITER + api + DELIMITER + method, parameters);
-            console.log(url);
+            var url = pdqmus.Api.formUrl(pdqmus.Api.PROXY_URL + BASE_URL + DELIMITER + api + DELIMITER + method, parameters);
             asynchRequest.loadJson(url);
         }
         function loadedCallback (result)

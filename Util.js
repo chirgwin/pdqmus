@@ -7,7 +7,7 @@
 
 pdqmus.Util = function()
 {
-}
+};
 
 //32 bit
 pdqmus.Util.strFromDword = function(dword, endianness)
@@ -42,10 +42,11 @@ pdqmus.Util.strFromWord = function(word, endianness)
 };
 
 //8 bit
-pdqmus.Util.strFromByte = function(byte)
+pdqmus.Util.strFromByte = function(aByte)
 {
-    return String.fromCharCode(byte & 0xFF);
+    return String.fromCharCode(aByte & 0xFF);
 };  
+
 
 pdqmus.Util.strFromVariableInt = function(value)
 {
@@ -83,7 +84,7 @@ pdqmus.Util.strFromVariableInt = function(value)
     }
     
     return returnValue;
-}  
+};
 
 pdqmus.Util.getPosition = function(event)
 {

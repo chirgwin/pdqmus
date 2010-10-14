@@ -14,22 +14,39 @@ The "Q" refers to the quickness of development, not performance. On the contrary
 
 hello, world
 ------------
-    //middle c, with a duration of 1 second
-    var notes = [new pdqmus.Note(0, 1, 60)];
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>hello, world</title>
+    <script type="text/javascript" src="pdqmus.min.js"></script>
+    <script type="text/javascript">
+    <!--
+    function helloWorld()
+    {
+        //middle c, with a duration of 1 second
+        var notes = [new pdqmus.Note(0, 1, 60)];
 
-    //create and play MIDI  
-    var midi = new pdqmus.Midi();
-    midi.addTrack(notes);
-    midi.play();
+        //create and play MIDI  
+        var midi = new pdqmus.Midi();
+        midi.addTrack(notes);
+        midi.play();
 
-    //create and play audio
-    var audioSequence = new pdqmus.AudioSequence(notes);
-    audioSequence.play();
+        //create and play audio
+        var audioSequence = new pdqmus.AudioSequence(notes);
+        audioSequence.play();
 
-    //draw a piano roll
-    var pianoRoll = new pdqmus.PianoRoll(notes);
-    pianoRoll.draw();
+        //draw a piano roll
+        var pianoRoll = new pdqmus.PianoRoll(notes);
+        pianoRoll.draw();  
+    }
+    -->
+    </script>
 
+    </head>
+    <body onload="helloWorld();">
+    </body>
+
+    </html>
 hello, solar system
 -------------------
     //middle c, d, e with a duration of a 1/4 second, varying velocities

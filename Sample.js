@@ -7,7 +7,6 @@
  */
 pdqmus.Sample = function()
 {
-    this.domRef;    
     this.domRef = document.createElement("audio");
     this.domRef.preload = true;
 }

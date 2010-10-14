@@ -17,7 +17,7 @@ pdqmus.TimeSignature = function(onset, numerator, denominator, onsetMetric)
     this.duration = 0;
 }
 
-pdqmus.TimeSignature.prototype = new Notation;
+pdqmus.TimeSignature.prototype = new pdqmus.Notation;
 
 
 pdqmus.TimeSignature.prototype.clone = function()

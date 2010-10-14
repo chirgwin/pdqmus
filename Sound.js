@@ -6,7 +6,7 @@
  */
 pdqmus.Sound = function()
 {
-    this.id;
+    this.id = null;
 }
 
 pdqmus.Sound.prototype.play = function()

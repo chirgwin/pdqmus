@@ -3,14 +3,14 @@
  * An asynchronous (non-blocking) HTTP request.
  * @constructor
  * @this {pdqmus.AsynchRequest}
- * @param {function} loadedCallback function to call when loaded
+ * @param {object} loadedCallback function to call when loaded
  * @param {string} method HTTP method, e.g. "POST"
  */
 
 pdqmus.AsynchRequest = function(loadedCallback, method)
 {
-    this.string;
-    this.data;
+    this.string = null;
+    this.data = null;
     this.xmlHttp = pdqmus.XmlHttpRequest.create();
     this.errorCallback = null;
     this.requestObj = null;

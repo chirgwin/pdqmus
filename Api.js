@@ -27,7 +27,7 @@ pdqmus.Api.soundingStoneRowGen = function(pitchClasses, loadedCallback, errorCal
     {
         throw ("must have 3 numeric pitch classes, no more, no less")
     }
-    var url = Api.PROXY_URL + "http://www.soundingstone.net/cgi-bin/rowgen.cgi?mode=json"
+    var url = pdqmus.Api.PROXY_URL + "http://www.soundingstone.net/cgi-bin/rowgen.cgi?mode=json"
     
     for (var i = 0; i < 3; i ++)
     {
@@ -39,10 +39,10 @@ pdqmus.Api.soundingStoneRowGen = function(pitchClasses, loadedCallback, errorCal
     ar.loadJson(url);  
 };
 
-Api.sappHenon = function(loadedCallback, errorCallback)
+pdqmus.Api.sappHenon = function(loadedCallback, errorCallback)
 {
     //TODO: post options 
-    var url = Api.PROXY_URL + "http://henon.sapp.org/cgi-bin/henonsequence"
+    var url = pdqmus.Api.PROXY_URL + "http://henon.sapp.org/cgi-bin/henonsequence"
     
     var ar = new pdqmus.AsynchRequest(loadedCallback, "POST");
     ar.parseJsonResponse = false;
