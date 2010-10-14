@@ -77,23 +77,41 @@ pre
 </div>
 <div class="section">
     <h2>hello, world     <a href="hello_world.html">run</a></h2>
-    <pre>
-    //middle c, with a duration of 1 second
-    var notes = [new pdqmus.Note(0, 1, 60)];
-
-    //create and play MIDI  
-    var midi = new pdqmus.Midi();
-    midi.addTrack(notes);
-    midi.play();
-
-    //create and play audio
-    var audioSequence = new pdqmus.AudioSequence(notes);
-    audioSequence.play();
-
-    //draw a piano roll
-    var pianoRoll = new pdqmus.PianoRoll(notes);
-    pianoRoll.draw();
-    </pre>
+    <pre><code>
+    &lt;!DOCTYPE html&gt;
+    &lt;html&gt;
+    &lt;head&gt;
+    &lt;title&gt;hello, world&lt;/title&gt;
+    &lt;script type="text/javascript" src="pdqmus.min.js"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript"&gt;
+    &lt;!--
+    function helloWorld()
+    {
+        //middle c, with a duration of 1 second
+        var notes = [new pdqmus.Note(0, 1, 60)];
+    
+        //create and play MIDI  
+        var midi = new pdqmus.Midi();
+        midi.addTrack(notes);
+        midi.play();
+    
+        //create and play audio
+        var audioSequence = new pdqmus.AudioSequence(notes);
+        audioSequence.play();
+    
+        //draw a piano roll
+        var pianoRoll = new pdqmus.PianoRoll(notes);
+        pianoRoll.draw();  
+    }
+    --&gt;
+    &lt;/script&gt;
+    
+    &lt;/head&gt;
+    &lt;body onload="helloWorld();"&gt;
+    &lt;/body&gt;
+    
+    &lt;/html&gt;
+</code></pre>
 </div>
 <div class="section">
     <h2>hello, solar system <a href="hello_solar_system.html">run</a></h2>
