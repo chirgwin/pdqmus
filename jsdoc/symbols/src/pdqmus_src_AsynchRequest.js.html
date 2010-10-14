@@ -10,14 +10,14 @@
 <span class='line'>  3</span>  * An asynchronous (non-blocking) HTTP request.
 <span class='line'>  4</span>  * @constructor
 <span class='line'>  5</span>  * @this {pdqmus.AsynchRequest}
-<span class='line'>  6</span>  * @param {function} loadedCallback function to call when loaded
+<span class='line'>  6</span>  * @param {object} loadedCallback function to call when loaded
 <span class='line'>  7</span>  * @param {string} method HTTP method, e.g. "POST"
 <span class='line'>  8</span>  */</span><span class="WHIT">
 <span class='line'>  9</span> 
 <span class='line'> 10</span> </span><span class="NAME">pdqmus.AsynchRequest</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">loadedCallback</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">method</span><span class="PUNC">)</span><span class="WHIT">
 <span class='line'> 11</span> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 12</span> </span><span class="WHIT">    </span><span class="NAME">this.string</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 13</span> </span><span class="WHIT">    </span><span class="NAME">this.data</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="WHIT">    </span><span class="NAME">this.string</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 13</span> </span><span class="WHIT">    </span><span class="NAME">this.data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 14</span> </span><span class="WHIT">    </span><span class="NAME">this.xmlHttp</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pdqmus.XmlHttpRequest.create</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 15</span> </span><span class="WHIT">    </span><span class="NAME">this.errorCallback</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 16</span> </span><span class="WHIT">    </span><span class="NAME">this.requestObj</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
