@@ -1,0 +1,41 @@
+.sequencer
+{
+    width: 680px;
+    height: 380px;
+}
+
+.sequencer .row
+{
+    width: 680px;
+}
+
+.beatbox
+{
+    border: 3px solid #352;    
+    -moz-border-radius: 5px;
+    border-radius: 5px;    
+    width: 24px;
+    height: 24px;
+    margin: 4px;
+    float: left;
+}
+
+.beatOn
+{
+    background-color: #C53; 
+}
+
+.beatOff
+{
+    background-color: white;
+}
+
+.beatHighlighted
+{
+    border: 3px solid #3C5;   
+}
+
+.downbeat
+{
+    margin-left: 24px;
+}
