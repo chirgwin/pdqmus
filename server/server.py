@@ -9,7 +9,7 @@ import string
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):                
-        self.write("pdqmus")
+        self.redirect("/static/index.html")
 
 class ProxyHandler(tornado.web.RequestHandler):
     def get(self):
@@ -36,6 +36,12 @@ class Nl2XmlHandler(tornado.web.RequestHandler):
         self.write(musicXml)
         temp.close()
 
+
+#redirect anything at /dist/* to /static/dist/*
+class DistAliasHandler(tornado.web.RequestHandler):
+    def get(self, url):                
+        self.redirect("/static/dist/" + url)
+
 settings = {
     "static_path": "../."
 }
@@ -43,10 +49,12 @@ application = tornado.web.Application([
     (r"/", MainHandler),
     (r"/nl2xml", Nl2XmlHandler),
     (r"/proxy", ProxyHandler),
+    (r"/dist/(.+)", DistAliasHandler),
 ], **settings)
 
 if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
-    http_server.listen(8888)
+    #run on port 7376 (PDQM in phone digits)
+    http_server.listen(7376)
     tornado.ioloop.IOLoop.instance().start()
 

@@ -1,6 +1,4 @@
-importScripts("pdqmus.js", "Base64.js", "Util.js", "Sound.js", "Sample.js",
-              "Wave.js", "Notation.js", "Note.js");
-
+importScripts("pdqmus.min.js");
 /*
  * Receives and handles a wave render WebWorker event.
  * @param {Object} event WebWorker event object

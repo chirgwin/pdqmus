@@ -6,7 +6,7 @@
  * @param notes {Array} a sequence of pdqmus.Note objects
  * @param oscillatorType {string} the type of oscillator to synthesize
  * @param envelope {string} the type of envelope shape
- * @param includePath {string} path to include for WebWorker script
+ * @param includePath {string} path to include for WebWorker script, should be relative to enclosing HTML
  */
 
 pdqmus.AudioSequence = function(notes, oscillatorType, envelope, includePath)
@@ -33,34 +33,30 @@ pdqmus.AudioSequence = function(notes, oscillatorType, envelope, includePath)
     var _aggregateWaveNeedsUpdate = true;
     var _startCallback = null;
     var _finishCallback = null;
+    var _includePath = includePath || pdqmus.AudioSequence.DEFAULT_WEBWORKER_INCLUDE_PATH;
 
     var self = this;
-    /* set up the web worker */    
-    var waveRenderWorker;
-    if (!!window.Worker) 
+    var waveRenderWorker = null;
+    /* set up the web worker */
+    function setUpWebWorker()
     {
-        if (includePath) 
+        if (!!window.Worker) 
         {
-            waveRenderWorker = new Worker(includePath + "/wave_render_worker.js");
-        }
-        else 
-        {
-            waveRenderWorker = new Worker("wave_render_worker.js");
-        }
-
-        waveRenderWorker.onmessage = function(event) 
-        {  
-            var renderMessage = event.data;
-            buffer.push(renderMessage);    
-        };  
-        
-        waveRenderWorker.onerror = function(error) 
-        {  
-            //console.log("Worker error: " + error.message + "\n");
-            throw error;  
-        };    
-    }    
-
+            waveRenderWorker = new Worker(_includePath + "/wave_render_worker.js");
+            waveRenderWorker.onmessage = function(event) 
+            {  
+                var renderMessage = event.data;
+                buffer.push(renderMessage);    
+            };  
+            
+            waveRenderWorker.onerror = function(error) 
+            {  
+                //console.log("Worker error: " + error.message + "\n");
+                throw error;  
+            };    
+        }    
+    }
+    
     /* make a single wave "file" from all notes */
     function aggregateWave()
     {
@@ -121,6 +117,12 @@ pdqmus.AudioSequence = function(notes, oscillatorType, envelope, includePath)
         {
             pdqmus.Sample.createFromUrl(self.getDataUrl()).play();
             return;
+        }
+        
+        //make sure web worker is ready to go for asynch playback
+        if (!waveRenderWorker)
+        {
+            setUpWebWorker();
         }
         //asynchronous playback
         startTime = new Date(); 
@@ -213,3 +215,6 @@ pdqmus.AudioSequence = function(notes, oscillatorType, envelope, includePath)
 
 //seconds
 pdqmus.AudioSequence.BUFFER_DELAY = 0.3;
+
+//ensure webworker file is loaded
+pdqmus.AudioSequence.DEFAULT_WEBWORKER_INCLUDE_PATH = "/dist";

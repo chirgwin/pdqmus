@@ -9,4 +9,7 @@ Running:
 `python2.6 server.py`
 
 Point browser at:
-http://localhost:8888/static/index.html
+http://localhost:7376/
+
+Anything in root 'pdqmus' directory (.. from here) will be served up here:
+http://localhost:7376/static/

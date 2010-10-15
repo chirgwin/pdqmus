@@ -1638,8 +1638,7 @@ function play()
     }
     
     var audioSequence = new pdqmus.AudioSequence(playbackNotes, pdqmus.Wave.OSC_SAWTOOTH, 
-                                          pdqmus.Envelope.DEFAULT_ENVELOPE,
-                                          '../..');
+                                          pdqmus.Envelope.DEFAULT_ENVELOPE);
                        
     //TODO: fix asynch playback (WebWorker include file broken in Firefox)                                                         
     audioSequence.play(true);
@@ -1662,8 +1661,7 @@ function playNote(note)
     var playbackNote = new pdqmus.Note(0, 0.2, note.midiNoteNum, pdqmus.Note.DEFAULT_VELOCITY);
             
     var audioSequence = new pdqmus.AudioSequence([playbackNote], pdqmus.Wave.OSC_SAWTOOTH, 
-                                          pdqmus.Envelope.DEFAULT_ENVELOPE,
-                                          '../..');
+                                          pdqmus.Envelope.DEFAULT_ENVELOPE);
                                         
     audioSequence.play();        
 }
