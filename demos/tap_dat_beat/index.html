@@ -1,33 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Tap Dat Beat</title>
+<title>Tap. Dat. Beat.</title>
 <script type="text/javascript" src="../../dist/pdqmus.min.js"></script>
 <script type="text/javascript">
 document.addEventListener("mousedown", handleTap, false);
-var firstTap = 0, prevTap = 0, numTaps = 0;
+var firstTap = null;
+var prevTap = 0, numTaps = 0;
 var times = [];
 var bpm = 0;
 var timeoutLoop;
 function handleTap(event)
 {	
-    beat.pause();
     clearTimeout(timeoutLoop);
+    beat.pause();
     beatOn();
-	var now = new Date();
-	prevTap = now.getTime();
+    var now = new Date();
+    prevTap = now.getTime();
 
-	if (firstTap == 0)
-		firstTap = prevTap;
-	
-	numTaps++;
+    if (!firstTap)
+    {
+	firstTap = prevTap;
+    }
+    
+    
+    if (numTaps > 0)
+    {
+	bpm = Math.round((numTaps / ((prevTap - firstTap) / 1000 / 60)));
+	document.getElementById("bpm").innerHTML = bpm + " bpm";
+	timeoutLoop = setTimeout(loop, ((60 / bpm * 1000)));
+    }
 
-    if (numTaps > 1)
-	{
-        bpm = Math.round((numTaps / ((prevTap - firstTap) / 1000 / 60)));
-		document.getElementById("bpm").innerHTML = bpm + " bpm";
-        timeoutLoop = setTimeout(loop,  ((60 / bpm * 1000) * 2));
-	}
+    numTaps++;
+
 }
 
 function beatOn()
@@ -47,6 +52,7 @@ function beatOff()
 
 function loop()
 {
+    clearTimeout(timeoutLoop);
     beatOn();
     
     timeoutLoop = setTimeout(loop, 60 / bpm * 1000);
@@ -68,6 +74,6 @@ var beat = pdqmus.Sample.createFromUrl(beatWave.getDataUrl());
 </style>
 </head>
 <body>
-<div id="bpm"></div>
+<div id="bpm">Tap. Dat. Beat.</div>
 </body>
 </html>
