@@ -37,14 +37,14 @@ pdqmus.AsynchRequest = function(loadedCallback, method)
 pdqmus.AsynchRequest.prototype.loadJson = function(url) 
 {    
     var self = this;
-    this.xmlHttp.overrideMimeType(XmlHttpRequest.CONTENT_TYPE_JSON);
+    this.xmlHttp.overrideMimeType(pdqmus.XmlHttpRequest.CONTENT_TYPE_JSON);
     this.xmlHttp.open(this.method, url, true);
-    this.xmlHttp.setRequestHeader(XmlHttpRequest.HEADER_ACCEPT, pdqmus.XmlHttpRequest.CONTENT_TYPE_JSON);
-    this.xmlHttp.setRequestHeader(XmlHttpRequest.HEADER_REQUESTED_WITH, pdqmus.XmlHttpRequest.REQUESTED_WITH_TYPE);
+    this.xmlHttp.setRequestHeader(pdqmus.XmlHttpRequest.HEADER_ACCEPT, pdqmus.XmlHttpRequest.CONTENT_TYPE_JSON);
+    this.xmlHttp.setRequestHeader(pdqmus.XmlHttpRequest.HEADER_REQUESTED_WITH, pdqmus.XmlHttpRequest.REQUESTED_WITH_TYPE);
     this.xmlHttp.onreadystatechange = handleReadyStateChange;
     if (this.requestObj)
     {        
-	    this.xmlHttp.setRequestHeader(XmlHttpRequest.HEADER_CONTENT_TYPE, pdqmus.XmlHttpRequest.CONTENT_TYPE_JSON);
+	this.xmlHttp.setRequestHeader(pdqmus.XmlHttpRequest.HEADER_CONTENT_TYPE, pdqmus.XmlHttpRequest.CONTENT_TYPE_JSON);
         this.requestData = JSON.stringify(this.requestObj);
     }
     this.xmlHttp.send(this.requestData);
@@ -59,7 +59,7 @@ pdqmus.AsynchRequest.prototype.loadJson = function(url)
                 {
                     self.data = JSON.parse(self.string);
                 }
-                if (XmlHttpRequest.SUCCESS_STATUSES.indexOf(self.xmlHttp.status) >= 0)
+                if (pdqmus.XmlHttpRequest.SUCCESS_STATUSES.indexOf(self.xmlHttp.status) >= 0)
                 {
                     if (self.loadedCallback != null)
                     {
@@ -92,10 +92,10 @@ pdqmus.AsynchRequest.prototype.loadJson = function(url)
 pdqmus.AsynchRequest.prototype.loadXml = function(url) 
 {    
     var self = this;
-    this.xmlHttp.overrideMimeType(XmlHttpRequest.CONTENT_TYPE_XML);
+    this.xmlHttp.overrideMimeType(pdqmus.XmlHttpRequest.CONTENT_TYPE_XML);
     this.xmlHttp.open(this.method, url, true);
-    this.xmlHttp.setRequestHeader(XmlHttpRequest.HEADER_ACCEPT, pdqmus.XmlHttpRequest.CONTENT_TYPE_XML);
-    this.xmlHttp.setRequestHeader(XmlHttpRequest.HEADER_REQUESTED_WITH, pdqmus.XmlHttpRequest.REQUESTED_WITH_TYPE);
+    this.xmlHttp.setRequestHeader(pdqmus.XmlHttpRequest.HEADER_ACCEPT, pdqmus.XmlHttpRequest.CONTENT_TYPE_XML);
+    this.xmlHttp.setRequestHeader(pdqmus.XmlHttpRequest.HEADER_REQUESTED_WITH, pdqmus.XmlHttpRequest.REQUESTED_WITH_TYPE);
     this.xmlHttp.onreadystatechange = handleReadyStateChange;
 
     this.xmlHttp.send(this.requestData);

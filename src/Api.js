@@ -15,10 +15,12 @@ pdqmus.Api = function()
 pdqmus.Api.musicXmlFromNotes = function(notes, loadedCallback, errorCallback)
 {
     var ar = new pdqmus.AsynchRequest(loadedCallback, "POST");
-    ar.errorCallback = errorCallback;
     notes.sort(pdqmus.Notation.sortByOnset);
-    ar.requestData = pdqmus.Notation.generateNotelist(notes);
-    ar.loadXml("/nl2xml");
+    var notelist = pdqmus.Notation.generateNotelist(notes);
+    ar.requestData = notelist;
+    ar.parseJsonResponse = false;
+    ar.errorCallback = errorCallback;
+    ar.loadJson("/nl2xml");
 };
 
 pdqmus.Api.soundingStoneRowGen = function(pitchClasses, loadedCallback, errorCallback)

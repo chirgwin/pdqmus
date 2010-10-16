@@ -26,7 +26,6 @@ class Nl2XmlHandler(tornado.web.RequestHandler):
     def post(self):
         #write request to temp file, then call nl2xml to read and translate
         temp = tempfile.NamedTemporaryFile()
-        pring("proxying")
         self.set_header("Content-Type", "text/xml")
         temp.write(self.request.body)
         temp.read(1)

@@ -179,3 +179,15 @@ Object.prototype.clone = function()
   return newObj;
 };
 
+pdqmus.Util.saveDataUrl = function(url)
+{
+    var saveWindowRef = window.open(url, "Save File");
+    alert("save with Save As...");
+    saveWindowRef.focus();
+    return saveWindowRef;
+}
+
+pdqmus.Util.dataUrlFromMusicXml = function(musicXml)
+{
+    return "data:text/xml;base64," + btoa(musicXml); 
+}

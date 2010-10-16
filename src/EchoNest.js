@@ -19,7 +19,7 @@ pdqmus.EchoNest = function(apiKey, loadedCallback)
     this.errorCallback = null;
     this.method = "GET";
     this.result = null;
-    this.useJsonp = false;
+    this.useJsonp = true;
     var self = this;
 
     this.call = function(api, method, params, callback, numRows) 

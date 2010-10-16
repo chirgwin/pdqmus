@@ -208,7 +208,7 @@ pdqmus.Midi = function(numTracks, tempo)
 	  	
 	this.getDataUrl = function()
 	{
-		return "data:" + pdqmus.Midi.MIME_TYPE + ";base64," + btoa(_header + _data); 
+	    return "data:" + pdqmus.Midi.MIME_TYPE + ";base64," + btoa(_header + _data); 
 	}
 	
 	init();	

@@ -41,10 +41,10 @@ pdqmus.Notation.prototype.getNearestNotelistDur = function(bpm)
     //TODO: handle dots
     var nearestDurationIdx = 0;
     var nearestDistance = 9999;
-    for (var i = 0; i < pdqmus.Note.METRIC_DURATIONS.length; i++)
+    for (var i = 0; i < pdqmus.Notation.METRIC_DURATIONS.length; i++)
     {
         var adjustedDuration = this.duration * (bpm / 60);
-        var distance = Math.abs(pdqmus.Note.METRIC_DURATIONS[i] - adjustedDuration);
+        var distance = Math.abs(pdqmus.Notation.METRIC_DURATIONS[i] - adjustedDuration);
         
         if (distance < nearestDistance)
         {
@@ -101,7 +101,7 @@ pdqmus.Notation.generateNotelist = function(notes, bpm)
     for (var i = 0; i < notes.length; i++)
     {    
         var note = notes[i];
-        var duration = Math.round(note.duration * pdqmus.Note.NOTELIST_TICKS_PER_QUARTER);
+        var duration = Math.round(note.duration * pdqmus.Notation.NOTELIST_TICKS_PER_QUARTER);
         notelist += "N t=" + time + " v=1 npt=1 stf=1 dur=" + note.getNearestNotelistDur(bpm) 
         + " dots=0 nn=" + note.noteNum
         + " acc=0 eAcc=0 pDur=" + (duration * 0.9)
