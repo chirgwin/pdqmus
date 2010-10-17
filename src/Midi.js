@@ -205,13 +205,21 @@ pdqmus.Midi = function(numTracks, tempo)
         + pdqmus.Util.strFromDword(track.length, pdqmus.Util.BIG_ENDIAN)
         + track;
     }
-	  	
-	this.getDataUrl = function()
-	{
+
+
+    this.getDataUrl = function(useBase64Lib)
+    {
+        if (useBase64Lib) 
+        {
+	    return "data:" + pdqmus.Midi.MIME_TYPE + ";base64," + Base64.encode(_header + _data); 
+        }
+        else //use native (requires method on browser window object)
+        {
 	    return "data:" + pdqmus.Midi.MIME_TYPE + ";base64," + btoa(_header + _data); 
-	}
-	
-	init();	
+        }
+    }
+    
+    init();	
 }
 
 pdqmus.Midi.prototype.play = function()
